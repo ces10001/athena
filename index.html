@@ -8,10 +8,20 @@
 <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
 <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
-*{box-sizing:border-box;margin:0;padding:0}body{background:#08080e;color:#e0e0e0;font-family:'DM Sans',-apple-system,sans-serif;-webkit-font-smoothing:antialiased}
-::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.08);border-radius:3px}select option{background:#12121e}::selection{background:rgba(167,139,250,0.3)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#08080e;color:#e0e0e0;font-family:'DM Sans',-apple-system,sans-serif;-webkit-font-smoothing:antialiased}
+::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.08);border-radius:3px}
+select option{background:#12121e}::selection{background:rgba(167,139,250,0.3)}
+.leaflet-container{background:#0f0f1a !important}
+.leaflet-tile-pane{filter:brightness(0.7) contrast(1.1) saturate(0.3) hue-rotate(200deg)}
+.leaflet-control-zoom a{background:#1a1a2e !important;color:#a78bfa !important;border-color:#333 !important}
+.leaflet-popup-content-wrapper{background:#1a1a2e;color:#e0e0e0;border-radius:10px;border:1px solid rgba(167,139,250,0.2)}
+.leaflet-popup-tip{background:#1a1a2e}
+.leaflet-popup-content{margin:10px 14px;font-family:'DM Sans',sans-serif;font-size:12px}
 </style>
 </head>
 <body>
@@ -20,31 +30,100 @@
 const{useState,useMemo,useEffect,useRef,useCallback}=React;
 
 const AF=[
-{name:"Affinity - New Haven",address:"1351 Whalley Ave, New Haven, CT",lat:41.3323,lng:-72.974,rating:4.7,reviews:1141},
-{name:"Affinity - Bridgeport",address:"2000 State St Ext, Bridgeport, CT",lat:41.1682,lng:-73.219,rating:4.9,reviews:1146},
+  {name:"Affinity - New Haven",lat:41.3323,lng:-72.974,rating:4.7,reviews:1141},
+  {name:"Affinity - Bridgeport",lat:41.1682,lng:-73.219,rating:4.9,reviews:1146},
 ];
-const CL=[
-{n:"RISE Dispensary Orange",a:"Orange, CT",lat:41.2727,lng:-72.9951,r:4.8,rv:2248,ch:"RISE"},{n:"RISE Dispensary Branford",a:"Branford, CT",lat:41.2979,lng:-72.773,r:4.8,rv:2253,ch:"RISE"},
-{n:"Fine Fettle Newington",a:"Newington, CT",lat:41.6905,lng:-72.7054,r:4.7,rv:2353,ch:"Fine Fettle"},{n:"Fine Fettle Manchester",a:"Manchester, CT",lat:41.812,lng:-72.5293,r:4.8,rv:1607,ch:"Fine Fettle"},{n:"Fine Fettle Willimantic",a:"Willimantic, CT",lat:41.7189,lng:-72.2361,r:4.6,rv:1047,ch:"Fine Fettle"},{n:"Fine Fettle Stamford",a:"Stamford, CT",lat:41.0777,lng:-73.5199,r:4.6,rv:498,ch:"Fine Fettle"},{n:"Fine Fettle Norwalk",a:"Norwalk, CT",lat:41.1264,lng:-73.422,r:4.6,rv:210,ch:"Fine Fettle"},{n:"Fine Fettle Bristol",a:"Bristol, CT",lat:41.6973,lng:-72.9025,r:4.7,rv:311,ch:"Fine Fettle"},{n:"Fine Fettle Waterbury",a:"Waterbury, CT",lat:41.5663,lng:-73.0914,r:4.7,rv:115,ch:"Fine Fettle"},
-{n:"Zen Leaf Meriden",a:"Meriden, CT",lat:41.5253,lng:-72.7569,r:4.7,rv:1486,ch:"Zen Leaf"},{n:"Zen Leaf Waterbury",a:"Waterbury, CT",lat:41.5704,lng:-73.058,r:4.7,rv:1006,ch:"Zen Leaf"},{n:"Zen Leaf Norwich",a:"Norwich, CT",lat:41.5158,lng:-72.1005,r:4.3,rv:292,ch:"Zen Leaf"},{n:"Zen Leaf Ashford",a:"Ashford, CT",lat:41.8591,lng:-72.1826,r:4.8,rv:77,ch:"Zen Leaf"},{n:"Zen Leaf Naugatuck",a:"Naugatuck, CT",lat:41.4786,lng:-73.0482,r:4.3,rv:197,ch:"Zen Leaf"},{n:"Zen Leaf Enfield",a:"Enfield, CT",lat:41.9975,lng:-72.5826,r:4.5,rv:158,ch:"Zen Leaf"},{n:"Zen Leaf Newington",a:"Newington, CT",lat:41.6713,lng:-72.718,r:4.3,rv:218,ch:"Zen Leaf"},
-{n:"Curaleaf Stamford",a:"Stamford, CT",lat:41.0559,lng:-73.5279,r:4.5,rv:521,ch:"Curaleaf"},{n:"Curaleaf Manchester",a:"Manchester, CT",lat:41.8036,lng:-72.5541,r:4.7,rv:407,ch:"Curaleaf"},{n:"Curaleaf Groton",a:"Groton, CT",lat:41.3667,lng:-72.0661,r:4.3,rv:673,ch:"Curaleaf"},
-{n:"Budr Cannabis Stratford",a:"Stratford, CT",lat:41.2539,lng:-73.1011,r:4.7,rv:230,ch:"Budr"},{n:"Budr Cannabis Danbury",a:"Danbury, CT",lat:41.3929,lng:-73.5195,r:4.4,rv:702,ch:"Budr"},{n:"Budr Cannabis Vernon",a:"Vernon, CT",lat:41.8361,lng:-72.4913,r:4.7,rv:554,ch:"Budr"},{n:"Budr Cannabis Montville",a:"Uncasville, CT",lat:41.4497,lng:-72.106,r:4.6,rv:871,ch:"Budr"},{n:"Budr Cannabis Tolland",a:"Tolland, CT",lat:41.8605,lng:-72.357,r:4.9,rv:237,ch:"Budr"},
-{n:"Shangri-La Norwalk",a:"Norwalk, CT",lat:41.1478,lng:-73.4257,r:4.5,rv:147,ch:"Shangri-La"},{n:"Shangri-La Waterbury",a:"Waterbury, CT",lat:41.5355,lng:-72.9978,r:4.6,rv:109,ch:"Shangri-La"},{n:"Shangri-La Plainville",a:"Plainville, CT",lat:41.6748,lng:-72.838,r:4.7,rv:315,ch:"Shangri-La"},
-{n:"Sweetspot West Hartford",a:"West Hartford, CT",lat:41.7567,lng:-72.7152,r:4.9,rv:682,ch:"Sweetspot"},{n:"Sweetspot Stamford",a:"Stamford, CT",lat:41.0759,lng:-73.549,r:4.9,rv:469,ch:"Sweetspot"},
-{n:"Higher Collective Bridgeport",a:"Bridgeport, CT",lat:41.1547,lng:-73.2353,r:4.9,rv:283,ch:"Higher Collective"},{n:"Higher Collective New London",a:"New London, CT",lat:41.3502,lng:-72.103,r:4.7,rv:303,ch:"Higher Collective"},
-{n:"Insa New Haven",a:"New Haven, CT",lat:41.2942,lng:-72.9227,r:4.4,rv:177,ch:"Insa"},{n:"Insa Hartford",a:"Hartford, CT",lat:41.7353,lng:-72.6599,r:4.3,rv:235,ch:"Insa"},
-{n:"Crisp Cannabis Cromwell",a:"Cromwell, CT",lat:41.6021,lng:-72.6827,r:4.7,rv:84,ch:"Crisp"},{n:"Crisp Cannabis E Hartford",a:"East Hartford, CT",lat:41.7576,lng:-72.6429,r:4.7,rv:91,ch:"Crisp"},
-{n:"Venu Flower Collective",a:"Middletown, CT",lat:41.5539,lng:-72.6823,r:4.8,rv:766,ch:"Venu"},{n:"Lit New Haven Cannabis",a:"New Haven, CT",lat:41.3029,lng:-72.9103,r:4.9,rv:166,ch:"Lit"},
-{n:"Trulieve Bristol",a:"Bristol, CT",lat:41.6926,lng:-72.9162,r:4.6,rv:718,ch:"Trulieve"},{n:"Hi! People Derby",a:"Derby, CT",lat:41.3276,lng:-73.0847,r:4.7,rv:244,ch:"Hi! People"},
-{n:"High Profile Hamden",a:"Hamden, CT",lat:41.3912,lng:-72.8978,r:4.6,rv:213,ch:"High Profile"},{n:"Rejoice Meriden",a:"Meriden, CT",lat:41.5418,lng:-72.7867,r:4.1,rv:154,ch:"Rejoice"},
-{n:"Nightjar East Lyme",a:"East Lyme, CT",lat:41.3216,lng:-72.253,r:4.9,rv:128,ch:"Nightjar"},{n:"Still River Wellness",a:"Torrington, CT",lat:41.8807,lng:-73.0758,r:4.6,rv:386,ch:"Still River"},
-{n:"Octane Enfield",a:"Enfield, CT",lat:41.9904,lng:-72.5833,r:4.4,rv:169,ch:"Octane"},{n:"Nova Farms New Britain",a:"New Britain, CT",lat:41.7149,lng:-72.7628,r:5.0,rv:283,ch:"Nova Farms"},
-].map(x=>({name:x.n,address:x.a,lat:x.lat,lng:x.lng,rating:x.r,reviews:x.rv,chain:x.ch}));
+
+const ALL_C=[
+{n:"Higher Collective Bridgeport",lat:41.1547,lng:-73.2353,r:4.9,rv:283,ch:"Higher Collective"},
+{n:"Lit New Haven Cannabis",lat:41.3029,lng:-72.9103,r:4.9,rv:166,ch:"Lit"},
+{n:"Insa New Haven",lat:41.2942,lng:-72.9227,r:4.4,rv:177,ch:"Insa"},
+{n:"RISE Dispensary Orange",lat:41.2727,lng:-72.9951,r:4.8,rv:2248,ch:"RISE"},
+{n:"High Profile Hamden",lat:41.3912,lng:-72.8978,r:4.6,rv:213,ch:"High Profile"},
+{n:"Hi! People Derby",lat:41.3276,lng:-73.0847,r:4.7,rv:244,ch:"Hi! People"},
+{n:"Rejoice Seymour",lat:41.3976,lng:-73.0619,r:4.6,rv:27,ch:"Rejoice"},
+{n:"Budr Cannabis Stratford",lat:41.2539,lng:-73.1011,r:4.7,rv:230,ch:"Budr"},
+{n:"RISE Dispensary Branford",lat:41.2979,lng:-72.773,r:4.8,rv:2253,ch:"RISE"},
+{n:"Zen Leaf Naugatuck",lat:41.4786,lng:-73.0482,r:4.3,rv:197,ch:"Zen Leaf"},
+{n:"Shangri-La Waterbury",lat:41.5355,lng:-72.9978,r:4.6,rv:109,ch:"Shangri-La"},
+{n:"Zen Leaf Meriden",lat:41.5253,lng:-72.7569,r:4.7,rv:1486,ch:"Zen Leaf"},
+{n:"Curaleaf Stamford",lat:41.0559,lng:-73.5279,r:4.5,rv:521,ch:"Curaleaf"},
+{n:"Sweetspot Stamford",lat:41.0759,lng:-73.549,r:4.9,rv:469,ch:"Sweetspot"},
+{n:"Fine Fettle Newington",lat:41.6905,lng:-72.7054,r:4.7,rv:2353,ch:"Fine Fettle"},
+// Additional competitors (not price-tracked but shown on map/lists)
+{n:"Fine Fettle Manchester",lat:41.812,lng:-72.5293,r:4.8,rv:1607,ch:"Fine Fettle"},
+{n:"Fine Fettle Willimantic",lat:41.7189,lng:-72.2361,r:4.6,rv:1047,ch:"Fine Fettle"},
+{n:"Fine Fettle Stamford",lat:41.0777,lng:-73.5199,r:4.6,rv:498,ch:"Fine Fettle"},
+{n:"Fine Fettle Bristol",lat:41.6973,lng:-72.9025,r:4.7,rv:311,ch:"Fine Fettle"},
+{n:"Zen Leaf Waterbury",lat:41.5704,lng:-73.058,r:4.7,rv:1006,ch:"Zen Leaf"},
+{n:"Zen Leaf Norwich",lat:41.5158,lng:-72.1005,r:4.3,rv:292,ch:"Zen Leaf"},
+{n:"Curaleaf Manchester",lat:41.8036,lng:-72.5541,r:4.7,rv:407,ch:"Curaleaf"},
+{n:"Curaleaf Groton",lat:41.3667,lng:-72.0661,r:4.3,rv:673,ch:"Curaleaf"},
+{n:"Budr Cannabis Vernon",lat:41.8361,lng:-72.4913,r:4.7,rv:554,ch:"Budr"},
+{n:"Budr Cannabis Montville",lat:41.4497,lng:-72.106,r:4.6,rv:871,ch:"Budr"},
+{n:"Budr Cannabis Tolland",lat:41.8605,lng:-72.357,r:4.9,rv:237,ch:"Budr"},
+{n:"Shangri-La Plainville",lat:41.6748,lng:-72.838,r:4.7,rv:315,ch:"Shangri-La"},
+{n:"Sweetspot West Hartford",lat:41.7567,lng:-72.7152,r:4.9,rv:682,ch:"Sweetspot"},
+{n:"Higher Collective New London",lat:41.3502,lng:-72.103,r:4.7,rv:303,ch:"Higher Collective"},
+{n:"Venu Flower Collective",lat:41.5539,lng:-72.6823,r:4.8,rv:766,ch:"Venu"},
+{n:"Trulieve Bristol",lat:41.6926,lng:-72.9162,r:4.6,rv:718,ch:"Trulieve"},
+{n:"Nightjar East Lyme",lat:41.3216,lng:-72.253,r:4.9,rv:128,ch:"Nightjar"},
+{n:"Still River Wellness",lat:41.8807,lng:-73.0758,r:4.6,rv:386,ch:"Still River"},
+{n:"Nova Farms New Britain",lat:41.7149,lng:-72.7628,r:5.0,rv:283,ch:"Nova Farms"},
+{n:"Octane Enfield",lat:41.9904,lng:-72.5833,r:4.4,rv:169,ch:"Octane"},
+{n:"Insa Hartford",lat:41.7353,lng:-72.6599,r:4.3,rv:235,ch:"Insa"},
+{n:"Rejoice Meriden",lat:41.5418,lng:-72.7867,r:4.1,rv:154,ch:"Rejoice"},
+].map(x=>({name:x.n,lat:x.lat,lng:x.lng,rating:x.r,reviews:x.rv,chain:x.ch,tracked:false}));
+
+// Mark first 15 as price-tracked
+ALL_C.slice(0,15).forEach(c=>c.tracked=true);
 
 const gD=(a,b,c,d)=>{const R=3959,dL=((c-a)*Math.PI)/180,dO=((d-b)*Math.PI)/180,x=Math.sin(dL/2)**2+Math.cos((a*Math.PI)/180)*Math.cos((c*Math.PI)/180)*Math.sin(dO/2)**2;return R*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x));};
-const CH=[...new Set(CL.map(c=>c.chain))].sort();
 const CATS=["Flower","Pre-Rolls","Vaporizers","Edibles","Concentrates","Tinctures"];
+const CH=[...new Set(ALL_C.map(c=>c.chain))].sort();
 
+// ─── MAP COMPONENT ──────────────────────────────────────────
+function MapView({competitors,home,sel,setSel,setTab}){
+  const mapRef=useRef(null);
+  const mapInst=useRef(null);
+  const markersRef=useRef([]);
+
+  useEffect(()=>{
+    if(mapInst.current)return;
+    const map=L.map(mapRef.current,{zoomControl:true,attributionControl:false}).setView([41.35,-72.9],9);
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',{maxZoom:18}).addTo(map);
+    mapInst.current=map;
+    return()=>{if(mapInst.current){mapInst.current.remove();mapInst.current=null;}};
+  },[]);
+
+  useEffect(()=>{
+    if(!mapInst.current)return;
+    const map=mapInst.current;
+    markersRef.current.forEach(m=>map.removeLayer(m));
+    markersRef.current=[];
+
+    // Affinity markers (purple)
+    AF.forEach(a=>{
+      const m=L.circleMarker([a.lat,a.lng],{radius:10,fillColor:"#a78bfa",color:"#fff",weight:2,fillOpacity:1}).addTo(map);
+      m.bindPopup(`<div style="text-align:center"><strong style="color:#a78bfa;font-size:14px">${a.name}</strong><br><span style="color:#888">${a.rating}⭐ · ${a.reviews.toLocaleString()} reviews</span></div>`);
+      markersRef.current.push(m);
+    });
+
+    // Competitor markers
+    competitors.forEach(c=>{
+      const col=c.threat==="HIGH"?"#ff3b5c":c.threat==="MEDIUM"?"#ff9f1c":"#2ec4b6";
+      const sz=c.tracked?8:5;
+      const m=L.circleMarker([c.lat,c.lng],{radius:sz,fillColor:col,color:c.tracked?"#fff":"transparent",weight:c.tracked?1.5:0,fillOpacity:c.tracked?0.9:0.5}).addTo(map);
+      m.bindPopup(`<strong style="color:#fff">${c.name}</strong><br><span style="color:${col}">${c.threat}</span> · ${c.rating}⭐ · ${c.reviews.toLocaleString()} reviews<br><span style="color:#888">${c.chain} · ${c.distance.toFixed(1)}mi</span>${c.tracked?'<br><span style="color:#a78bfa">📊 Price tracked</span>':''}`);
+      m.on('click',()=>{setSel(c);setTab("competitors");});
+      markersRef.current.push(m);
+    });
+  },[competitors,home]);
+
+  return <div ref={mapRef} style={{width:"100%",height:400,borderRadius:12,overflow:"hidden",border:"1px solid rgba(255,255,255,0.05)"}}/>;
+}
+
+// ─── MAIN APP ───────────────────────────────────────────────
 function App(){
   const[hi,setHi]=useState(0);
   const[rad,setRad]=useState(30);
@@ -58,37 +137,43 @@ function App(){
   const[sd,setSd]=useState(null);
   const[loading,setLoading]=useState(true);
   const[lastUp,setLastUp]=useState(null);
-  const[io,setIo]=useState(false);
-  const fr=useRef(null);
   const home=AF[hi];
 
-  // AUTO-FETCH data on load and every 30 minutes
+  // Auto-fetch data
   const fetchData=useCallback(async()=>{
     try{
       const r=await fetch('./dashboard_data.json?t='+Date.now());
-      if(r.ok){const d=await r.json();setSd(d);setLastUp(d.scraped_at||new Date().toISOString());setLoading(false);return;}
+      if(r.ok){const d=await r.json();if(d.products&&d.products.length>0){setSd(d);setLastUp(d.scraped_at);}}
     }catch(e){}
-    // Fallback: try localStorage
-    try{const d=localStorage.getItem("af-data");if(d){setSd(JSON.parse(d));setLastUp(localStorage.getItem("af-date"));}}catch(e){}
     setLoading(false);
   },[]);
-
   useEffect(()=>{fetchData();const iv=setInterval(fetchData,30*60*1000);return()=>clearInterval(iv);},[fetchData]);
 
-  const doFile=(e)=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=(ev)=>{try{const d=JSON.parse(ev.target.result);setSd(d);setLastUp(new Date().toISOString());localStorage.setItem("af-data",ev.target.result);localStorage.setItem("af-date",new Date().toLocaleString());setIo(false);}catch(e){alert("Invalid JSON");}};r.readAsText(f);};
+  // Manual import fallback
+  const fr=useRef(null);
+  const[io,setIo]=useState(false);
+  const doFile=(e)=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{try{const d=JSON.parse(ev.target.result);setSd(d);setLastUp(d.scraped_at||new Date().toISOString());setIo(false);}catch(err){alert("Invalid JSON");}};r.readAsText(f);};
 
   const comps=useMemo(()=>{
-    return CL.map(c=>{const d=gD(home.lat,home.lng,c.lat,c.lng);const ts=(c.reviews>500?3:c.reviews>100?2:1)+(c.rating>=4.8?3:c.rating>=4.5?2:1)+(d<10?3:d<20?2:1);return{...c,distance:d,ts,threat:ts>=7?"HIGH":ts>=5?"MEDIUM":"LOW"};})
-    .filter(c=>vm==="statewide"||c.distance<=rad).filter(c=>cf==="all"||c.chain===cf)
-    .sort((a,b)=>sb==="distance"?a.distance-b.distance:sb==="rating"?b.rating-a.rating:sb==="reviews"?b.reviews-a.reviews:b.ts-a.ts);
+    return ALL_C.map(c=>{
+      const d=gD(home.lat,home.lng,c.lat,c.lng);
+      const ts=(c.reviews>500?3:c.reviews>100?2:1)+(c.rating>=4.8?3:c.rating>=4.5?2:1)+(d<10?3:d<20?2:1);
+      return{...c,distance:d,ts,threat:ts>=7?"HIGH":ts>=5?"MEDIUM":"LOW"};
+    }).filter(c=>vm==="statewide"||c.distance<=rad)
+      .filter(c=>cf==="all"||c.chain===cf)
+      .sort((a,b)=>sb==="distance"?a.distance-b.distance:sb==="rating"?b.rating-a.rating:sb==="reviews"?b.reviews-a.reviews:b.ts-a.ts);
   },[rad,vm,sb,hi,cf]);
 
   const pp=useMemo(()=>{
     if(!sd?.products)return[];
     return sd.products.filter(p=>p.category===pc).map(p=>{
-      const pr=Object.entries(p.dispensaries||{});const af=pr.find(([d])=>d.includes("Affinity"));const cp=pr.filter(([d])=>!d.includes("Affinity"));
-      const ch=cp.length?cp.reduce((a,b)=>a[1]<b[1]?a:b):null;const ex=cp.length?cp.reduce((a,b)=>a[1]>b[1]?a:b):null;
-      const av=cp.length?(cp.reduce((s,x)=>s+x[1],0)/cp.length):0;const afP=af?af[1]:null;
+      const pr=Object.entries(p.dispensaries||{});
+      const af=pr.find(([d])=>d.includes("Affinity"));
+      const cp=pr.filter(([d])=>!d.includes("Affinity"));
+      const ch=cp.length?cp.reduce((a,b)=>a[1]<b[1]?a:b):null;
+      const ex=cp.length?cp.reduce((a,b)=>a[1]>b[1]?a:b):null;
+      const av=cp.length?(cp.reduce((s,x)=>s+x[1],0)/cp.length):0;
+      const afP=af?af[1]:null;
       return{...p,afP,ch,ex,av:Math.round(av*100)/100,sv:afP&&av?Math.round((av-afP)*100)/100:0,cc:cp.length};
     }).sort((a,b)=>ps==="price_asc"?(a.afP||999)-(b.afP||999):ps==="price_desc"?(b.afP||0)-(a.afP||0):ps==="savings"?b.sv-a.sv:a.sv-b.sv);
   },[sd,pc,ps]);
@@ -97,31 +182,39 @@ function App(){
   const hic=comps.filter(c=>c.threat==="HIGH").length;
   const cc={};comps.forEach(c=>{cc[c.chain]=(cc[c.chain]||0)+1;});
   const ucs=(sd?.products||[]).filter(p=>{const af=Object.entries(p.dispensaries||{}).find(([d])=>d.includes("Affinity"));const cp=Object.entries(p.dispensaries||{}).filter(([d])=>!d.includes("Affinity"));return af&&cp.some(([,pr])=>pr<af[1]);});
+  const fmtDate=d=>{if(!d||d==="waiting")return"Waiting for first scrape...";try{return new Date(d).toLocaleString();}catch(e){return d;}};
 
+  // Styles
   const P=a=>({padding:"7px 14px",borderRadius:8,border:"1px solid",borderColor:a?"#a78bfa":"rgba(255,255,255,0.08)",background:a?"rgba(167,139,250,0.14)":"transparent",color:a?"#a78bfa":"#666",fontSize:11,fontWeight:700,cursor:"pointer"});
   const B={background:"rgba(255,255,255,0.025)",border:"1px solid rgba(255,255,255,0.05)",borderRadius:12,padding:"16px 18px"};
-  const S={background:"rgba(255,255,255,0.04)",border:"1px solid rgba(255,255,255,0.08)",borderRadius:6,padding:"5px 10px",color:"#aaa",fontSize:11};
+  const Sel={background:"rgba(255,255,255,0.04)",border:"1px solid rgba(255,255,255,0.08)",borderRadius:6,padding:"5px 10px",color:"#aaa",fontSize:11};
+  const H3={margin:"0 0 14px",fontSize:12,fontWeight:700,letterSpacing:1.5,color:"#666",textTransform:"uppercase"};
   const T=({l})=>{const c={HIGH:"#ff3b5c",MEDIUM:"#ff9f1c",LOW:"#2ec4b6"}[l];return<span style={{background:c+"20",color:c,padding:"2px 10px",borderRadius:20,fontSize:10,fontWeight:700,letterSpacing:1}}>{l}</span>;};
   const tabs=["overview","pricing","deals","competitors","seo"];
 
-  const fmtDate=(d)=>{if(!d||d==="sample")return"Sample data";try{return new Date(d).toLocaleString();}catch(e){return d;}};
-
-  if(loading)return<div style={{display:"flex",alignItems:"center",justifyContent:"center",height:"100vh",flexDirection:"column",gap:16}}><div style={{width:40,height:40,border:"3px solid #a78bfa",borderTopColor:"transparent",borderRadius:"50%",animation:"spin 1s linear infinite"}}/><div style={{color:"#666",fontSize:14}}>Loading competitor data...</div><style>{"@keyframes spin{to{transform:rotate(360deg)}}"}</style></div>;
+  if(loading)return<div style={{display:"flex",alignItems:"center",justifyContent:"center",height:"100vh",flexDirection:"column",gap:16}}><div style={{width:40,height:40,border:"3px solid #a78bfa",borderTopColor:"transparent",borderRadius:"50%",animation:"spin 1s linear infinite"}}/><div style={{color:"#666"}}>Loading...</div><style>{"@keyframes spin{to{transform:rotate(360deg)}}"}</style></div>;
 
   return(
     <div style={{minHeight:"100vh"}}>
+      {/* HEADER */}
       <div style={{background:"linear-gradient(135deg,#0c0c18,#1a0a2e 60%,#0a1628)",borderBottom:"1px solid rgba(255,255,255,0.05)",padding:"24px 28px 16px"}}>
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",flexWrap:"wrap",gap:12}}>
           <div>
-            <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:4}}><div style={{width:8,height:8,borderRadius:"50%",background:"#2ec4b6",boxShadow:"0 0 10px #2ec4b688"}}/><span style={{fontSize:10,color:"#2ec4b6",letterSpacing:3,fontWeight:700}}>LIVE INTEL · {CL.length} LOCATIONS · {sd?.products?.length||0} PRODUCTS</span></div>
+            <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:4}}>
+              <div style={{width:8,height:8,borderRadius:"50%",background:"#2ec4b6",boxShadow:"0 0 10px #2ec4b688"}}/>
+              <span style={{fontSize:10,color:"#2ec4b6",letterSpacing:3,fontWeight:700}}>LIVE INTEL · {ALL_C.length} LOCATIONS · {sd?.products?.length||0} PRODUCTS</span>
+            </div>
             <h1 style={{fontSize:28,fontWeight:800,background:"linear-gradient(135deg,#fff,#a78bfa)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent"}}>AFFINITY — Competitor Intel</h1>
-            <div style={{display:"flex",gap:12,marginTop:4,alignItems:"center"}}><div style={{fontSize:10,color:"#444"}}>Updated: {fmtDate(lastUp)}</div><button onClick={fetchData} style={{background:"none",border:"none",color:"#a78bfa",fontSize:10,cursor:"pointer",textDecoration:"underline"}}>↻ Refresh</button></div>
+            <div style={{display:"flex",gap:12,marginTop:4,alignItems:"center"}}>
+              <div style={{fontSize:10,color:"#444"}}>Updated: {fmtDate(lastUp)}</div>
+              <button onClick={fetchData} style={{background:"none",border:"none",color:"#a78bfa",fontSize:10,cursor:"pointer",textDecoration:"underline"}}>↻ Refresh</button>
+            </div>
           </div>
           <div style={{display:"flex",flexDirection:"column",gap:8,alignItems:"flex-end"}}>
             <div style={{display:"flex",gap:6}}>
               <span style={{fontSize:11,color:"#555",alignSelf:"center"}}>Home:</span>
               {AF.map((l,i)=><button key={i} onClick={()=>{setHi(i);setSel(null);}} style={P(hi===i)}>{l.name.replace("Affinity - ","")}</button>)}
-              <button onClick={()=>setIo(!io)} style={{...P(false),borderColor:"rgba(46,196,182,0.3)",color:"#2ec4b6"}}>📥 Manual Import</button>
+              <button onClick={()=>setIo(!io)} style={{...P(false),borderColor:"rgba(46,196,182,0.3)",color:"#2ec4b6"}}>📥 Import</button>
             </div>
             <div style={{display:"flex",gap:6,alignItems:"center"}}>
               <button onClick={()=>setVm("radius")} style={P(vm==="radius")}>Radius</button>
@@ -131,7 +224,6 @@ function App(){
           </div>
         </div>
         {io&&<div style={{marginTop:12,padding:16,background:"rgba(46,196,182,0.06)",border:"1px solid rgba(46,196,182,0.2)",borderRadius:10}}>
-          <div style={{fontSize:12,color:"#2ec4b6",fontWeight:700,marginBottom:8}}>Manual Data Import (backup — data auto-loads normally)</div>
           <input ref={fr} type="file" accept=".json" onChange={doFile} style={{display:"none"}}/>
           <button onClick={()=>fr.current?.click()} style={{padding:"6px 14px",borderRadius:6,border:"1px solid rgba(46,196,182,0.3)",background:"transparent",color:"#2ec4b6",fontSize:11,cursor:"pointer"}}>Upload JSON File</button>
         </div>}
@@ -139,62 +231,130 @@ function App(){
       </div>
 
       <div style={{padding:"20px 28px",maxWidth:1400,margin:"0 auto"}}>
+
+        {/* ── OVERVIEW ─────────────────────────────── */}
         {tab==="overview"&&<>
           <div style={{display:"flex",gap:12,flexWrap:"wrap",marginBottom:20}}>
-            {[{l:"Competitors",v:comps.length,s:vm==="radius"?`Within ${rad}mi`:"Statewide",c:"#a78bfa"},{l:"High Threats",v:hic,c:"#ff3b5c",s:"Close + rated + reviewed"},{l:"Products Tracked",v:sd?.products?.length||0,c:"#2ec4b6",s:"All dispensaries"},{l:"Active Deals",v:deals.length,c:"#ff9f1c",s:"Competitor specials"}].map(x=>
-              <div key={x.l} style={{...B,flex:"1 1 140px",minWidth:140}}><div style={{fontSize:10,color:"#666",letterSpacing:1.5,textTransform:"uppercase",marginBottom:4}}>{x.l}</div><div style={{fontSize:26,fontWeight:800,color:x.c}}>{x.v}</div><div style={{fontSize:11,color:"#444",marginTop:2}}>{x.s}</div></div>)}
+            {[{l:"Competitors",v:comps.length,s:vm==="radius"?`Within ${rad}mi`:"Statewide",c:"#a78bfa"},{l:"High Threats",v:hic,c:"#ff3b5c",s:"Close + rated + reviewed"},{l:"Products Tracked",v:sd?.products?.length||0,c:"#2ec4b6",s:"15 closest dispensaries"},{l:"Active Deals",v:deals.length,c:"#ff9f1c",s:"Competitor specials"}].map(x=>
+              <div key={x.l} style={{...B,flex:"1 1 140px",minWidth:140}}><div style={{fontSize:10,color:"#666",letterSpacing:1.5,textTransform:"uppercase",marginBottom:4}}>{x.l}</div><div style={{fontSize:26,fontWeight:800,color:x.c}}>{x.v}</div><div style={{fontSize:11,color:"#444",marginTop:2}}>{x.s}</div></div>
+            )}
           </div>
-          <div style={{...B,marginBottom:20}}>
-            <div style={{fontSize:12,fontWeight:700,letterSpacing:1.5,color:"#666",textTransform:"uppercase",marginBottom:14}}>🚨 Price Alerts — Competitors Cheaper ({ucs.length})</div>
-            {ucs.slice(0,6).map(p=>{const af=Object.entries(p.dispensaries).find(([d])=>d.includes("Affinity"));const ch=Object.entries(p.dispensaries).filter(([d,pr])=>!d.includes("Affinity")&&pr<af[1]).sort((a,b)=>a[1]-b[1]);
+
+          {/* MAP */}
+          <div style={{...B,marginBottom:20,padding:0,overflow:"hidden"}}>
+            <div style={{padding:"16px 18px 8px"}}><div style={H3}>📍 Competitor Map — Connecticut</div></div>
+            <MapView competitors={comps} home={home} sel={sel} setSel={setSel} setTab={setTab}/>
+            <div style={{display:"flex",gap:16,padding:"10px 18px",justifyContent:"center"}}>
+              {[["Affinity","#a78bfa"],["High Threat","#ff3b5c"],["Medium","#ff9f1c"],["Low","#2ec4b6"]].map(([l,c])=>
+                <div key={l} style={{display:"flex",alignItems:"center",gap:5,fontSize:10,color:"#555"}}><div style={{width:8,height:8,borderRadius:"50%",background:c}}/>{l}</div>
+              )}
+              <div style={{display:"flex",alignItems:"center",gap:5,fontSize:10,color:"#555"}}><div style={{width:8,height:8,borderRadius:"50%",border:"1.5px solid #fff",background:"transparent"}}/> Price tracked</div>
+            </div>
+          </div>
+
+          {/* PRICE ALERTS */}
+          {ucs.length>0&&<div style={{...B,marginBottom:20}}>
+            <div style={H3}>🚨 Price Alerts — Competitors Cheaper ({ucs.length})</div>
+            {ucs.slice(0,6).map(p=>{const af=Object.entries(p.dispensaries).find(([d])=>d.includes("Affinity"));const cheaper=Object.entries(p.dispensaries).filter(([d,pr])=>!d.includes("Affinity")&&pr<af[1]).sort((a,b)=>a[1]-b[1]);
               return<div key={p.name+p.brand} style={{display:"flex",alignItems:"center",gap:12,padding:"10px 0",borderBottom:"1px solid rgba(255,255,255,0.03)"}}>
                 <div style={{width:6,height:6,borderRadius:"50%",background:"#ff3b5c",flexShrink:0}}/><div style={{flex:1}}><div style={{fontSize:13,fontWeight:700}}>{p.brand} — {p.name}</div><div style={{fontSize:11,color:"#666"}}>{p.category} · {p.weight}</div></div>
-                <div style={{textAlign:"right"}}><div style={{fontSize:13,fontFamily:"'JetBrains Mono'",color:"#a78bfa"}}>You: ${af[1]}</div><div style={{fontSize:11,color:"#ff3b5c"}}>{ch[0][0].split(" ").slice(0,3).join(" ")}: ${ch[0][1]} (−${af[1]-ch[0][1]})</div></div></div>;})}
+                <div style={{textAlign:"right"}}><div style={{fontSize:13,fontFamily:"'JetBrains Mono'",color:"#a78bfa"}}>You: ${af[1]}</div><div style={{fontSize:11,color:"#ff3b5c"}}>{cheaper[0][0].split(" ").slice(0,3).join(" ")}: ${cheaper[0][1]} (−${af[1]-cheaper[0][1]})</div></div></div>;})}
+          </div>}
+
+          {/* TOP THREATS */}
+          <div style={B}>
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:14}}>
+              <div style={H3}>Top Threats</div>
+              <select value={sb} onChange={e=>setSb(e.target.value)} style={Sel}><option value="distance">Nearest</option><option value="threat">Threat</option><option value="rating">Rating</option><option value="reviews">Reviews</option></select>
+            </div>
+            {comps.slice(0,8).map(c=><div key={c.name} onClick={()=>{setSel(c);setTab("competitors");}} style={{display:"flex",alignItems:"center",gap:12,padding:"10px 0",borderBottom:"1px solid rgba(255,255,255,0.03)",cursor:"pointer"}}>
+              <div style={{flex:1}}><div style={{fontWeight:700,fontSize:13}}>{c.name}{c.tracked&&<span style={{marginLeft:6,fontSize:9,color:"#a78bfa"}}>📊</span>}</div><div style={{fontSize:10,color:"#555"}}>{c.distance.toFixed(1)}mi · {c.chain}</div></div>
+              <span style={{fontSize:12,color:"#888",fontFamily:"'JetBrains Mono'"}}>⭐{c.rating}</span>
+              <span style={{fontSize:11,color:"#555",minWidth:50,textAlign:"right"}}>{c.reviews.toLocaleString()}</span>
+              <T l={c.threat}/>
+            </div>)}
           </div>
-          <div style={B}><div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:14}}><div style={{fontSize:12,fontWeight:700,letterSpacing:1.5,color:"#666",textTransform:"uppercase"}}>Top Threats</div><select value={sb} onChange={e=>setSb(e.target.value)} style={S}><option value="distance">Nearest</option><option value="threat">Threat</option><option value="rating">Rating</option><option value="reviews">Reviews</option></select></div>
-            {comps.slice(0,8).map(c=><div key={c.name} onClick={()=>{setSel(c);setTab("competitors");}} style={{display:"flex",alignItems:"center",gap:12,padding:"10px 0",borderBottom:"1px solid rgba(255,255,255,0.03)",cursor:"pointer"}}><div style={{flex:1}}><div style={{fontWeight:700,fontSize:13}}>{c.name}</div><div style={{fontSize:10,color:"#555"}}>{c.distance.toFixed(1)}mi · {c.chain}</div></div><span style={{fontSize:12,color:"#888",fontFamily:"'JetBrains Mono'"}}>⭐{c.rating}</span><span style={{fontSize:11,color:"#555",minWidth:50,textAlign:"right"}}>{c.reviews.toLocaleString()}</span><T l={c.threat}/></div>)}</div>
         </>}
 
+        {/* ── PRICING ──────────────────────────────── */}
         {tab==="pricing"&&<>
-          <div style={{display:"flex",gap:8,marginBottom:16,flexWrap:"wrap",alignItems:"center"}}>{CATS.map(cat=><button key={cat} onClick={()=>setPc(cat)} style={P(pc===cat)}>{cat}</button>)}<div style={{flex:1}}/><select value={ps} onChange={e=>setPs(e.target.value)} style={S}><option value="price_asc">Price ↑</option><option value="price_desc">Price ↓</option><option value="savings">You Win</option><option value="undercut">You Lose</option></select></div>
-          {(()=>{const cp=pp;if(!cp.length)return null;const aA=cp.filter(p=>p.afP).reduce((s,p)=>s+p.afP,0)/(cp.filter(p=>p.afP).length||1);const cA=cp.filter(p=>p.av).reduce((s,p)=>s+p.av,0)/(cp.filter(p=>p.av).length||1);const w=aA<=cA;
-            return<div style={{...B,marginBottom:16,display:"flex",gap:20,alignItems:"center",flexWrap:"wrap"}}><div><div style={{fontSize:10,color:"#666",letterSpacing:1}}>YOUR AVG</div><div style={{fontSize:24,fontWeight:800,color:"#a78bfa",fontFamily:"'JetBrains Mono'"}}>${aA.toFixed(2)}</div></div><div style={{fontSize:20,color:"#444"}}>vs</div><div><div style={{fontSize:10,color:"#666",letterSpacing:1}}>COMPETITOR AVG</div><div style={{fontSize:24,fontWeight:800,color:w?"#ff3b5c":"#2ec4b6",fontFamily:"'JetBrains Mono'"}}>${cA.toFixed(2)}</div></div>
-              <div style={{padding:"6px 14px",borderRadius:8,background:w?"rgba(46,196,182,0.12)":"rgba(255,59,92,0.12)",color:w?"#2ec4b6":"#ff3b5c",fontSize:12,fontWeight:700}}>{w?`✓ $${(cA-aA).toFixed(2)} cheaper avg`:`⚠ They're $${(aA-cA).toFixed(2)} cheaper avg`}</div></div>;})()}
-          <div style={{...B,padding:0,overflow:"hidden"}}><div style={{overflowX:"auto"}}><table style={{width:"100%",borderCollapse:"collapse",fontSize:12}}>
-            <thead><tr style={{borderBottom:"1px solid rgba(255,255,255,0.06)"}}>{["PRODUCT","AFFINITY","CHEAPEST","PRICIEST","AVG","EDGE"].map(h=><th key={h} style={{padding:"12px 10px",textAlign:h==="PRODUCT"?"left":"center",color:h==="AFFINITY"?"#a78bfa":h==="CHEAPEST"?"#2ec4b6":h==="PRICIEST"?"#ff3b5c":"#666",fontSize:10,fontWeight:700,position:"sticky",top:0,background:"#0a0a14",zIndex:2}}>{h}</th>)}</tr></thead>
-            <tbody>{pp.map(p=><tr key={p.name+p.brand} style={{borderBottom:"1px solid rgba(255,255,255,0.03)"}}>
-              <td style={{padding:"10px 14px"}}><div style={{fontWeight:700,fontSize:13}}>{p.name}</div><div style={{fontSize:10,color:"#555"}}>{p.brand} · {p.weight}</div></td>
-              <td style={{padding:"10px",textAlign:"center",fontFamily:"'JetBrains Mono'",color:"#a78bfa",fontWeight:800,fontSize:13}}>{p.afP?`$${p.afP}`:"—"}</td>
-              <td style={{padding:"10px",textAlign:"center"}}>{p.ch?<><span style={{fontFamily:"'JetBrains Mono'",color:"#2ec4b6",fontWeight:700}}>${p.ch[1]}</span><div style={{fontSize:9,color:"#555"}}>{p.ch[0].split(" ").slice(0,2).join(" ")}</div></>:"—"}</td>
-              <td style={{padding:"10px",textAlign:"center"}}>{p.ex?<><span style={{fontFamily:"'JetBrains Mono'",color:"#ff3b5c",fontWeight:700}}>${p.ex[1]}</span><div style={{fontSize:9,color:"#555"}}>{p.ex[0].split(" ").slice(0,2).join(" ")}</div></>:"—"}</td>
-              <td style={{padding:"10px",textAlign:"center",fontFamily:"'JetBrains Mono'",color:"#888"}}>${p.av}</td>
-              <td style={{padding:"10px",textAlign:"center"}}>{p.afP?<span style={{fontFamily:"'JetBrains Mono'",fontWeight:700,color:p.sv>0?"#2ec4b6":p.sv<0?"#ff3b5c":"#666"}}>{p.sv>0?"+":""}{p.sv.toFixed(0)}</span>:"—"}</td>
-            </tr>)}</tbody></table></div></div>
-        </>}
-
-        {tab==="deals"&&<>
-          <div style={{display:"flex",gap:12,flexWrap:"wrap",marginBottom:16}}>{[{l:"Active Deals",v:deals.length,c:"#ff9f1c"},{l:"% Off",v:deals.filter(d=>d.type==="percent").length,c:"#a78bfa"},{l:"$ Off",v:deals.filter(d=>d.type==="dollar").length,c:"#2ec4b6"},{l:"Other",v:deals.filter(d=>!["percent","dollar"].includes(d.type)).length,c:"#ff3b5c"}].map(x=><div key={x.l} style={{...B,flex:"1 1 120px",minWidth:120}}><div style={{fontSize:10,color:"#666",letterSpacing:1.5,textTransform:"uppercase",marginBottom:4}}>{x.l}</div><div style={{fontSize:26,fontWeight:800,color:x.c}}>{x.v}</div></div>)}</div>
-          <div style={B}><div style={{fontSize:12,fontWeight:700,letterSpacing:1.5,color:"#666",textTransform:"uppercase",marginBottom:14}}>All Active Competitor Deals</div>
-            {deals.map((d,i)=>{const tc=d.type==="percent"?"#a78bfa":d.type==="dollar"?"#2ec4b6":"#ff9f1c";
-              return<div key={i} style={{display:"flex",alignItems:"center",gap:14,padding:"12px 0",borderBottom:"1px solid rgba(255,255,255,0.03)"}}><div style={{width:44,height:44,borderRadius:10,background:tc+"15",display:"flex",alignItems:"center",justifyContent:"center",fontSize:16,flexShrink:0}}>{d.type==="percent"?"%":d.type==="dollar"?"$":"🏷"}</div><div style={{flex:1}}><div style={{fontWeight:700,fontSize:13}}>{d.title}</div><div style={{fontSize:11,color:"#666"}}>{d.dispensary}</div></div>
-                <div style={{textAlign:"right"}}><div style={{fontSize:11,padding:"2px 10px",borderRadius:4,background:tc+"18",color:tc,fontWeight:700}}>{d.category}</div>{d.expires&&<div style={{fontSize:10,color:"#555",marginTop:4}}>Exp {new Date(d.expires).toLocaleDateString()}</div>}</div></div>;})}
+          <div style={{display:"flex",gap:8,marginBottom:16,flexWrap:"wrap",alignItems:"center"}}>
+            {CATS.map(cat=><button key={cat} onClick={()=>setPc(cat)} style={P(pc===cat)}>{cat}</button>)}
+            <div style={{flex:1}}/>
+            <select value={ps} onChange={e=>setPs(e.target.value)} style={Sel}><option value="price_asc">Price ↑</option><option value="price_desc">Price ↓</option><option value="savings">You Win</option><option value="undercut">You Lose</option></select>
           </div>
+          {pp.length===0&&<div style={{...B,textAlign:"center",padding:40}}><div style={{fontSize:18,color:"#444",marginBottom:8}}>No {pc} data yet</div><div style={{fontSize:12,color:"#333"}}>Data will appear after the scraper runs successfully</div></div>}
+          {pp.length>0&&<>
+            {(()=>{const aA=pp.filter(p=>p.afP).reduce((s,p)=>s+p.afP,0)/(pp.filter(p=>p.afP).length||1);const cA=pp.filter(p=>p.av).reduce((s,p)=>s+p.av,0)/(pp.filter(p=>p.av).length||1);const w=aA<=cA;
+              return<div style={{...B,marginBottom:16,display:"flex",gap:20,alignItems:"center",flexWrap:"wrap"}}>
+                <div><div style={{fontSize:10,color:"#666",letterSpacing:1}}>YOUR AVG</div><div style={{fontSize:24,fontWeight:800,color:"#a78bfa",fontFamily:"'JetBrains Mono'"}}>${aA.toFixed(2)}</div></div>
+                <div style={{fontSize:20,color:"#444"}}>vs</div>
+                <div><div style={{fontSize:10,color:"#666",letterSpacing:1}}>COMPETITOR AVG</div><div style={{fontSize:24,fontWeight:800,color:w?"#ff3b5c":"#2ec4b6",fontFamily:"'JetBrains Mono'"}}>${cA.toFixed(2)}</div></div>
+                <div style={{padding:"6px 14px",borderRadius:8,background:w?"rgba(46,196,182,0.12)":"rgba(255,59,92,0.12)",color:w?"#2ec4b6":"#ff3b5c",fontSize:12,fontWeight:700}}>{w?`✓ $${(cA-aA).toFixed(2)} cheaper avg`:`⚠ They're $${(aA-cA).toFixed(2)} cheaper avg`}</div></div>;})()}
+            <div style={{...B,padding:0,overflow:"hidden"}}><div style={{overflowX:"auto"}}><table style={{width:"100%",borderCollapse:"collapse",fontSize:12}}>
+              <thead><tr style={{borderBottom:"1px solid rgba(255,255,255,0.06)"}}>
+                {["PRODUCT","AFFINITY","CHEAPEST","PRICIEST","AVG","EDGE"].map(h=><th key={h} style={{padding:"12px 10px",textAlign:h==="PRODUCT"?"left":"center",color:h==="AFFINITY"?"#a78bfa":h==="CHEAPEST"?"#2ec4b6":h==="PRICIEST"?"#ff3b5c":"#666",fontSize:10,fontWeight:700,position:"sticky",top:0,background:"#0a0a14",zIndex:2}}>{h}</th>)}
+              </tr></thead>
+              <tbody>{pp.map(p=><tr key={p.name+p.brand} style={{borderBottom:"1px solid rgba(255,255,255,0.03)"}}>
+                <td style={{padding:"10px 14px"}}><div style={{fontWeight:700,fontSize:13}}>{p.name}</div><div style={{fontSize:10,color:"#555"}}>{p.brand} · {p.weight}</div></td>
+                <td style={{padding:"10px",textAlign:"center",fontFamily:"'JetBrains Mono'",color:"#a78bfa",fontWeight:800,fontSize:13}}>{p.afP?`$${p.afP}`:"—"}</td>
+                <td style={{padding:"10px",textAlign:"center"}}>{p.ch?<><span style={{fontFamily:"'JetBrains Mono'",color:"#2ec4b6",fontWeight:700}}>${p.ch[1]}</span><div style={{fontSize:9,color:"#555"}}>{p.ch[0].split(" ").slice(0,2).join(" ")}</div></>:"—"}</td>
+                <td style={{padding:"10px",textAlign:"center"}}>{p.ex?<><span style={{fontFamily:"'JetBrains Mono'",color:"#ff3b5c",fontWeight:700}}>${p.ex[1]}</span><div style={{fontSize:9,color:"#555"}}>{p.ex[0].split(" ").slice(0,2).join(" ")}</div></>:"—"}</td>
+                <td style={{padding:"10px",textAlign:"center",fontFamily:"'JetBrains Mono'",color:"#888"}}>${p.av}</td>
+                <td style={{padding:"10px",textAlign:"center"}}>{p.afP?<span style={{fontFamily:"'JetBrains Mono'",fontWeight:700,color:p.sv>0?"#2ec4b6":p.sv<0?"#ff3b5c":"#666"}}>{p.sv>0?"+":""}{p.sv.toFixed(0)}</span>:"—"}</td>
+              </tr>)}</tbody></table></div></div>
+          </>}
         </>}
 
+        {/* ── DEALS ────────────────────────────────── */}
+        {tab==="deals"&&<>
+          {deals.length===0&&<div style={{...B,textAlign:"center",padding:40}}><div style={{fontSize:18,color:"#444",marginBottom:8}}>No deals yet</div><div style={{fontSize:12,color:"#333"}}>Deals will appear after the scraper runs</div></div>}
+          {deals.length>0&&<div style={B}>
+            <div style={H3}>Active Competitor Deals ({deals.length})</div>
+            {deals.map((d,i)=>{const tc=d.type==="percent"?"#a78bfa":d.type==="dollar"?"#2ec4b6":"#ff9f1c";
+              return<div key={i} style={{display:"flex",alignItems:"center",gap:14,padding:"12px 0",borderBottom:"1px solid rgba(255,255,255,0.03)"}}>
+                <div style={{width:44,height:44,borderRadius:10,background:tc+"15",display:"flex",alignItems:"center",justifyContent:"center",fontSize:16,flexShrink:0}}>{d.type==="percent"?"%":d.type==="dollar"?"$":"🏷"}</div>
+                <div style={{flex:1}}><div style={{fontWeight:700,fontSize:13}}>{d.title}</div><div style={{fontSize:11,color:"#666"}}>{d.dispensary}</div></div>
+                <div style={{fontSize:11,padding:"2px 10px",borderRadius:4,background:tc+"18",color:tc,fontWeight:700}}>{d.category}</div>
+              </div>;})}
+          </div>}
+        </>}
+
+        {/* ── COMPETITORS ──────────────────────────── */}
         {tab==="competitors"&&<div style={{display:"grid",gridTemplateColumns:sel?"1fr 1fr":"1fr",gap:16}}>
-          <div><div style={{display:"flex",gap:6,marginBottom:12}}><select value={cf} onChange={e=>setCf(e.target.value)} style={S}><option value="all">All ({comps.length})</option>{CH.map(c=><option key={c} value={c}>{c}</option>)}</select><select value={sb} onChange={e=>setSb(e.target.value)} style={S}><option value="distance">Nearest</option><option value="threat">Threat</option><option value="rating">Rating</option><option value="reviews">Reviews</option></select></div>
-            <div style={{maxHeight:600,overflowY:"auto"}}>{comps.map(c=><div key={c.name} onClick={()=>setSel(c)} style={{background:sel?.name===c.name?"rgba(167,139,250,0.07)":"rgba(255,255,255,0.015)",border:"1px solid",borderColor:sel?.name===c.name?"rgba(167,139,250,0.25)":"rgba(255,255,255,0.03)",borderRadius:10,padding:"12px 14px",marginBottom:6,cursor:"pointer"}}><div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}><div><div style={{fontWeight:700,fontSize:13}}>{c.name}</div><div style={{fontSize:10,color:"#555"}}>{c.distance.toFixed(1)}mi · {c.chain}</div></div><T l={c.threat}/></div><div style={{display:"flex",gap:16,marginTop:6,fontSize:11,color:"#666"}}><span>⭐ {c.rating}</span><span>💬 {c.reviews.toLocaleString()}</span></div></div>)}</div></div>
-          {sel&&<div style={{...B,position:"sticky",top:16,alignSelf:"start"}}><div style={{display:"flex",justifyContent:"space-between",marginBottom:16}}><h3 style={{fontSize:16,fontWeight:800}}>{sel.name}</h3><button onClick={()=>setSel(null)} style={{background:"none",border:"none",color:"#555",cursor:"pointer",fontSize:16}}>✕</button></div>
-            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:16}}>{[{l:"Rating",v:sel.rating,c:sel.rating>=home.rating?"#ff3b5c":"#2ec4b6",s:`You: ${home.rating}`},{l:"Reviews",v:sel.reviews.toLocaleString(),c:sel.reviews>=home.reviews?"#ff3b5c":"#2ec4b6",s:`You: ${home.reviews.toLocaleString()}`},{l:"Distance",v:`${sel.distance.toFixed(1)}mi`,c:"#a78bfa",s:`From ${home.name.split("- ")[1]}`},{l:"Chain",v:sel.chain,c:"#ff9f1c",s:`${cc[sel.chain]||1} locs`}].map(x=><div key={x.l} style={{background:"rgba(255,255,255,0.03)",borderRadius:8,padding:12}}><div style={{fontSize:9,color:"#555",letterSpacing:1,textTransform:"uppercase"}}>{x.l}</div><div style={{fontSize:22,fontWeight:800,color:x.c}}>{x.v}</div><div style={{fontSize:9,color:"#444"}}>{x.s}</div></div>)}</div>
-            {(()=>{const cp=(sd?.products||[]).filter(p=>p.dispensaries?.[sel.name]!=null);if(!cp.length)return<div style={{fontSize:12,color:"#444"}}>No pricing data yet.</div>;
-              return<div><div style={{fontSize:10,color:"#666",letterSpacing:1,textTransform:"uppercase",marginBottom:8}}>Prices ({cp.length})</div>{cp.slice(0,10).map(p=>{const tp=p.dispensaries[sel.name];const af=Object.entries(p.dispensaries).find(([d])=>d.includes("Affinity"));const afP=af?af[1]:null;const df=afP&&tp?(tp-afP):null;return<div key={p.name} style={{display:"flex",justifyContent:"space-between",padding:"6px 0",borderBottom:"1px solid rgba(255,255,255,0.03)",fontSize:12}}><span style={{color:"#ccc"}}>{p.name}</span><div style={{display:"flex",gap:8}}><span style={{color:"#a78bfa",fontFamily:"'JetBrains Mono'",fontWeight:700}}>{afP?`$${afP}`:"—"}</span><span style={{color:"#666"}}>vs</span><span style={{fontFamily:"'JetBrains Mono'",fontWeight:700,color:"#ccc"}}>${tp}</span>{df!=null&&<span style={{fontSize:10,fontWeight:700,color:df>0?"#2ec4b6":"#ff3b5c"}}>{df>0?"+":""}{df}</span>}</div></div>;})}</div>;})()}
+          <div>
+            <div style={{display:"flex",gap:6,marginBottom:12}}>
+              <select value={cf} onChange={e=>setCf(e.target.value)} style={Sel}><option value="all">All ({comps.length})</option>{CH.map(c=><option key={c} value={c}>{c}</option>)}</select>
+              <select value={sb} onChange={e=>setSb(e.target.value)} style={Sel}><option value="distance">Nearest</option><option value="threat">Threat</option><option value="rating">Rating</option><option value="reviews">Reviews</option></select>
+            </div>
+            <div style={{maxHeight:600,overflowY:"auto"}}>{comps.map(c=><div key={c.name} onClick={()=>setSel(c)} style={{background:sel?.name===c.name?"rgba(167,139,250,0.07)":"rgba(255,255,255,0.015)",border:"1px solid",borderColor:sel?.name===c.name?"rgba(167,139,250,0.25)":"rgba(255,255,255,0.03)",borderRadius:10,padding:"12px 14px",marginBottom:6,cursor:"pointer"}}>
+              <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}><div><div style={{fontWeight:700,fontSize:13}}>{c.name}{c.tracked&&<span style={{marginLeft:6,fontSize:9,color:"#a78bfa"}}>📊</span>}</div><div style={{fontSize:10,color:"#555"}}>{c.distance.toFixed(1)}mi · {c.chain}</div></div><T l={c.threat}/></div>
+              <div style={{display:"flex",gap:16,marginTop:6,fontSize:11,color:"#666"}}><span>⭐ {c.rating}</span><span>💬 {c.reviews.toLocaleString()}</span></div>
+            </div>)}</div>
+          </div>
+          {sel&&<div style={{...B,position:"sticky",top:16,alignSelf:"start"}}>
+            <div style={{display:"flex",justifyContent:"space-between",marginBottom:16}}><h3 style={{fontSize:16,fontWeight:800}}>{sel.name}</h3><button onClick={()=>setSel(null)} style={{background:"none",border:"none",color:"#555",cursor:"pointer",fontSize:16}}>✕</button></div>
+            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:16}}>
+              {[{l:"Rating",v:sel.rating,c:sel.rating>=home.rating?"#ff3b5c":"#2ec4b6",s:`You: ${home.rating}`},{l:"Reviews",v:sel.reviews.toLocaleString(),c:sel.reviews>=home.reviews?"#ff3b5c":"#2ec4b6",s:`You: ${home.reviews.toLocaleString()}`},{l:"Distance",v:`${sel.distance.toFixed(1)}mi`,c:"#a78bfa",s:`From ${home.name.split("- ")[1]}`},{l:"Chain",v:sel.chain,c:"#ff9f1c",s:`${cc[sel.chain]||1} locs`}].map(x=>
+                <div key={x.l} style={{background:"rgba(255,255,255,0.03)",borderRadius:8,padding:12}}><div style={{fontSize:9,color:"#555",letterSpacing:1,textTransform:"uppercase"}}>{x.l}</div><div style={{fontSize:22,fontWeight:800,color:x.c}}>{x.v}</div><div style={{fontSize:9,color:"#444"}}>{x.s}</div></div>
+              )}
+            </div>
+            {(()=>{const cp=(sd?.products||[]).filter(p=>p.dispensaries?.[sel.name]!=null);if(!cp.length)return<div style={{fontSize:12,color:"#444"}}>{sel.tracked?"No pricing data yet — waiting for scraper":"Not price-tracked (outside top 15)"}</div>;
+              return<div><div style={{fontSize:10,color:"#666",letterSpacing:1,textTransform:"uppercase",marginBottom:8}}>Prices ({cp.length})</div>{cp.slice(0,10).map(p=>{const tp=p.dispensaries[sel.name];const af=Object.entries(p.dispensaries).find(([d])=>d.includes("Affinity"));const afP=af?af[1]:null;const df=afP&&tp?(tp-afP):null;
+                return<div key={p.name} style={{display:"flex",justifyContent:"space-between",padding:"6px 0",borderBottom:"1px solid rgba(255,255,255,0.03)",fontSize:12}}>
+                  <span style={{color:"#ccc"}}>{p.name}</span>
+                  <div style={{display:"flex",gap:8}}><span style={{color:"#a78bfa",fontFamily:"'JetBrains Mono'",fontWeight:700}}>{afP?`$${afP}`:"—"}</span><span style={{color:"#666"}}>vs</span><span style={{fontFamily:"'JetBrains Mono'",fontWeight:700,color:"#ccc"}}>${tp}</span>{df!=null&&<span style={{fontSize:10,fontWeight:700,color:df>0?"#2ec4b6":"#ff3b5c"}}>{df>0?"+":""}{df}</span>}</div></div>;})}</div>;})()}
           </div>}
         </div>}
 
+        {/* ── SEO ───────────────────────────────────── */}
         {tab==="seo"&&<div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit, minmax(280px, 1fr))",gap:14}}>
-          <div style={B}><h4 style={{margin:"0 0 14px",fontSize:12,fontWeight:700,letterSpacing:1,color:"#ff3b5c",textTransform:"uppercase"}}>🎯 Conquest Keywords</h4>{comps.filter(c=>c.threat!=="LOW").slice(0,12).map(c=><div key={c.name} style={{display:"flex",justifyContent:"space-between",padding:"5px 0",borderBottom:"1px solid rgba(255,255,255,0.03)",fontSize:11}}><span style={{color:"#bbb",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",maxWidth:"70%"}}>"{c.name}"</span><T l={c.threat}/></div>)}</div>
-          <div style={B}><h4 style={{margin:"0 0 14px",fontSize:12,fontWeight:700,letterSpacing:1,color:"#2ec4b6",textTransform:"uppercase"}}>📈 SEO Targets</h4>{[{k:"best dispensary New Haven CT",v:"~1.2K/mo"},{k:"dispensary near me CT",v:"~3.5K/mo"},{k:"cheapest dispensary CT",v:"~900/mo"},{k:"weed delivery New Haven",v:"~500/mo"},{k:"dispensary Bridgeport CT",v:"~700/mo"},{k:"best edibles Connecticut",v:"~400/mo"}].map(x=><div key={x.k} style={{display:"flex",justifyContent:"space-between",padding:"5px 0",borderBottom:"1px solid rgba(255,255,255,0.03)",fontSize:11}}><span style={{color:"#bbb"}}>{x.k}</span><span style={{color:"#666",fontSize:10}}>{x.v}</span></div>)}</div>
-          <div style={B}><h4 style={{margin:"0 0 14px",fontSize:12,fontWeight:700,letterSpacing:1,color:"#ff9f1c",textTransform:"uppercase"}}>⚡ Quick Wins</h4>{[{a:"Google Ads on competitor names",i:"HIGH",s:"Now"},{a:"Optimize Google Business Profile",i:"HIGH",s:"Now"},{a:"Schema markup on website",i:"HIGH",s:"Now"},{a:"City landing pages (5 cities)",i:"HIGH",s:"Week 1"},{a:"Review QR code at checkout",i:"MED",s:"Week 1"},{a:"Blog: strain reviews & guides",i:"MED",s:"Ongoing"}].map(x=><div key={x.a} style={{padding:"7px 0",borderBottom:"1px solid rgba(255,255,255,0.03)"}}><div style={{fontSize:11,color:"#bbb",marginBottom:3}}>{x.a}</div><div style={{display:"flex",gap:6}}><span style={{fontSize:9,padding:"1px 7px",borderRadius:4,background:x.i==="HIGH"?"rgba(255,59,92,0.12)":"rgba(255,159,28,0.12)",color:x.i==="HIGH"?"#ff3b5c":"#ff9f1c"}}>{x.i}</span><span style={{fontSize:9,padding:"1px 7px",borderRadius:4,background:"rgba(167,139,250,0.12)",color:"#a78bfa"}}>{x.s}</span></div></div>)}</div>
+          <div style={B}><h4 style={{margin:"0 0 14px",fontSize:12,fontWeight:700,letterSpacing:1,color:"#ff3b5c",textTransform:"uppercase"}}>🎯 Conquest Keywords</h4>
+            {comps.filter(c=>c.threat!=="LOW").slice(0,12).map(c=><div key={c.name} style={{display:"flex",justifyContent:"space-between",padding:"5px 0",borderBottom:"1px solid rgba(255,255,255,0.03)",fontSize:11}}><span style={{color:"#bbb",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",maxWidth:"70%"}}>"{c.name}"</span><T l={c.threat}/></div>)}</div>
+          <div style={B}><h4 style={{margin:"0 0 14px",fontSize:12,fontWeight:700,letterSpacing:1,color:"#2ec4b6",textTransform:"uppercase"}}>📈 SEO Targets</h4>
+            {[{k:"best dispensary New Haven CT",v:"~1.2K/mo"},{k:"dispensary near me CT",v:"~3.5K/mo"},{k:"cheapest dispensary CT",v:"~900/mo"},{k:"weed delivery New Haven",v:"~500/mo"},{k:"dispensary Bridgeport CT",v:"~700/mo"},{k:"best edibles Connecticut",v:"~400/mo"}].map(x=><div key={x.k} style={{display:"flex",justifyContent:"space-between",padding:"5px 0",borderBottom:"1px solid rgba(255,255,255,0.03)",fontSize:11}}><span style={{color:"#bbb"}}>{x.k}</span><span style={{color:"#666",fontSize:10}}>{x.v}</span></div>)}</div>
+          <div style={B}><h4 style={{margin:"0 0 14px",fontSize:12,fontWeight:700,letterSpacing:1,color:"#ff9f1c",textTransform:"uppercase"}}>⚡ Quick Wins</h4>
+            {[{a:"Google Ads on competitor names",i:"HIGH",s:"Now"},{a:"Optimize Google Business Profile",i:"HIGH",s:"Now"},{a:"Schema markup on website",i:"HIGH",s:"Now"},{a:"City landing pages (5 cities)",i:"HIGH",s:"Week 1"},{a:"Review QR code at checkout",i:"MED",s:"Week 1"},{a:"Blog: strain reviews & guides",i:"MED",s:"Ongoing"}].map(x=><div key={x.a} style={{padding:"7px 0",borderBottom:"1px solid rgba(255,255,255,0.03)"}}><div style={{fontSize:11,color:"#bbb",marginBottom:3}}>{x.a}</div><div style={{display:"flex",gap:6}}><span style={{fontSize:9,padding:"1px 7px",borderRadius:4,background:x.i==="HIGH"?"rgba(255,59,92,0.12)":"rgba(255,159,28,0.12)",color:x.i==="HIGH"?"#ff3b5c":"#ff9f1c"}}>{x.i}</span><span style={{fontSize:9,padding:"1px 7px",borderRadius:4,background:"rgba(167,139,250,0.12)",color:"#a78bfa"}}>{x.s}</span></div></div>)}</div>
         </div>}
       </div>
     </div>
