@@ -1,8 +1,5 @@
 #!/usr/bin/env python3
-"""
-AFFINITY SCRAPER (Firecrawl v4) — Uses verified Leafly URLs as data source.
-Leafly has consistent menu pages with product names and prices for every CT dispensary.
-"""
+"""AFFINITY SCRAPER v5 — Direct dispensary websites via Firecrawl"""
 
 import json, os, sys, time, re, requests
 from datetime import datetime
@@ -11,25 +8,26 @@ EXTRACT_URL = "https://api.firecrawl.dev/v2/extract"
 SCRAPE_URL = "https://api.firecrawl.dev/v2/scrape"
 API_KEY = os.environ.get("FIRECRAWL_API_KEY", "")
 
-# Verified Leafly URLs — these all exist and show menu data
 STORES = [
-    {"name": "Affinity - New Haven", "url": "https://www.leafly.com/dispensary-info/affinity-dispensary-new-haven"},
-    {"name": "Affinity - Bridgeport", "url": "https://www.leafly.com/dispensary-info/affinity-dispensary-bridgeport"},
-    {"name": "Higher Collective Bridgeport", "url": "https://www.leafly.com/dispensary-info/higher-collective-bridgeport"},
-    {"name": "Lit New Haven Cannabis", "url": "https://www.leafly.com/dispensary-info/lit-new-haven"},
-    {"name": "Insa New Haven", "url": "https://www.leafly.com/dispensary-info/insa-cannabis-dispensary-new-haven"},
-    {"name": "RISE Dispensary Orange", "url": "https://www.leafly.com/dispensary-info/rise-cannabis-dispensary-orange"},
-    {"name": "High Profile Hamden", "url": "https://www.leafly.com/dispensary-info/high-profile-hamden"},
-    {"name": "Hi! People Derby", "url": "https://www.leafly.com/dispensary-info/hi-people-derby"},
-    {"name": "Budr Cannabis Stratford", "url": "https://www.leafly.com/dispensary-info/budr-cannabis-stratford"},
-    {"name": "RISE Dispensary Branford", "url": "https://www.leafly.com/dispensary-info/rise-cannabis-dispensary-branford"},
-    {"name": "Zen Leaf Naugatuck", "url": "https://www.leafly.com/dispensary-info/zen-leaf-naugatuck"},
-    {"name": "Zen Leaf Meriden", "url": "https://www.leafly.com/dispensary-info/zen-leaf-meriden"},
-    {"name": "Curaleaf Stamford", "url": "https://www.leafly.com/dispensary-info/curaleaf-ct-stamford"},
-    {"name": "Sweetspot Stamford", "url": "https://www.leafly.com/dispensary-info/sweetspot-cannabis-dispensary-stamford"},
-    {"name": "Fine Fettle Newington", "url": "https://www.leafly.com/dispensary-info/fine-fettle-newington"},
-    {"name": "Shangri-La Waterbury", "url": "https://www.leafly.com/dispensary-info/shangri-la-cannabis-adult-use-retailer-waterbury"},
-    {"name": "Rejoice Seymour", "url": "https://www.leafly.com/dispensary-info/rejoice-seymour"},
+    {"name": "Affinity NH (Rec)", "url": "https://www.affinityct.com/menu-adult"},
+    {"name": "Affinity NH (Med)", "url": "https://www.affinityct.com/menu"},
+    {"name": "Affinity BP (Rec)", "url": "https://www.affinityct.com/bridgeport-menu-adult"},
+    {"name": "Affinity BP (Med)", "url": "https://www.affinityct.com/bridgeport-menu"},
+    {"name": "Higher Collective Bridgeport", "url": "https://highercollective.com/locations/bridgeport/menu/"},
+    {"name": "Lit New Haven Cannabis", "url": "https://www.litnewhaven.com/shop/"},
+    {"name": "Insa New Haven", "url": "https://www.insacannabis.com/dispensaries/new-haven-ct"},
+    {"name": "RISE Dispensary Orange", "url": "https://risecannabis.com/dispensaries/connecticut/orange"},
+    {"name": "High Profile Hamden", "url": "https://highprofilecannabisnow.com/locations/hamden-ct"},
+    {"name": "Hi! People Derby", "url": "https://hipeople.co/derby"},
+    {"name": "Budr Cannabis Stratford", "url": "https://www.budr.com/stratford"},
+    {"name": "RISE Dispensary Branford", "url": "https://risecannabis.com/dispensaries/connecticut/branford"},
+    {"name": "Zen Leaf Naugatuck", "url": "https://zenleafdispensaries.com/location/naugatuck-ct"},
+    {"name": "Zen Leaf Meriden", "url": "https://zenleafdispensaries.com/location/meriden-ct"},
+    {"name": "Curaleaf Stamford", "url": "https://curaleaf.com/locations/connecticut/curaleaf-ct-stamford"},
+    {"name": "Sweetspot Stamford", "url": "https://sweetspotfarms.com/stamford-menu"},
+    {"name": "Fine Fettle Newington", "url": "https://finefettle.com/locations/newington"},
+    {"name": "Shangri-La Waterbury", "url": "https://shangriladispensary.com/waterbury-menu"},
+    {"name": "Rejoice Seymour", "url": "https://rejoicedispensary.com/seymour"},
 ]
 
 SCHEMA = {
@@ -64,9 +62,10 @@ SCHEMA = {
 }
 
 PROMPT = (
-    "Extract ALL cannabis products listed on this dispensary page. "
-    "For each product: name, brand, category (Flower/Pre-Rolls/Vaporizers/Edibles/Concentrates/Tinctures), "
-    "price in dollars, weight/size. Also extract any deals or specials."
+    "Extract ALL cannabis products from this dispensary menu page. "
+    "If there is an age verification gate, assume yes/21+. "
+    "For each product get: name, brand, category (Flower/Pre-Rolls/Vaporizers/Edibles/Concentrates/Tinctures), "
+    "price in dollars, weight/size. Also extract any deals, specials, or promotions."
 )
 
 HEADERS = {}
@@ -80,13 +79,12 @@ def try_extract(name, url):
     try:
         resp = requests.post(EXTRACT_URL, json=payload, headers=HEADERS, timeout=120)
         if resp.status_code == 429:
-            wait = 20
-            print(f"    rate limited, waiting {wait}s...")
-            time.sleep(wait)
+            print(f"    rate limited, waiting 25s...")
+            time.sleep(25)
             resp = requests.post(EXTRACT_URL, json=payload, headers=HEADERS, timeout=120)
         if resp.status_code != 200:
-            try: msg = resp.json().get("error","")[:150]
-            except: msg = resp.text[:150]
+            try: msg = resp.json().get("error","")[:200]
+            except: msg = resp.text[:200]
             print(f"    extract HTTP {resp.status_code}: {msg}")
             return None
         data = resp.json()
@@ -94,7 +92,7 @@ def try_extract(name, url):
             job_id = data.get("id")
             if job_id:
                 return poll_job(name, job_id)
-            print(f"    extract failed: {data.get('error','?')[:100]}")
+            print(f"    extract: {data.get('error','?')[:100]}")
             return None
         result = data.get("data", {})
         products = [p for p in result.get("products", []) if p.get("name") and p.get("price") and p["price"] > 0]
@@ -106,7 +104,7 @@ def try_extract(name, url):
 
 def poll_job(name, job_id):
     url = f"{EXTRACT_URL}/{job_id}"
-    for _ in range(24):
+    for _ in range(30):
         time.sleep(5)
         try:
             r = requests.get(url, headers=HEADERS, timeout=30)
@@ -127,7 +125,7 @@ def try_markdown(name, url):
     try:
         resp = requests.post(SCRAPE_URL, json={"url": url}, headers=HEADERS, timeout=90)
         if resp.status_code == 429:
-            time.sleep(20)
+            time.sleep(25)
             resp = requests.post(SCRAPE_URL, json={"url": url}, headers=HEADERS, timeout=90)
         if resp.status_code != 200:
             print(f"    markdown HTTP {resp.status_code}")
@@ -151,9 +149,8 @@ def parse_md(md):
         line = line.strip()
         if not line: continue
         lo = line.lower()
-        for c, lb in [("flower","Flower"),("pre-roll","Pre-Rolls"),("vape","Vaporizers"),("cartridge","Vaporizers"),("edible","Edibles"),("gumm","Edibles"),("concentrate","Concentrates"),("tincture","Tinctures")]:
-            if c in lo and len(line) < 50:
-                cat = lb; break
+        for c, lb in [("flower","Flower"),("pre-roll","Pre-Rolls"),("preroll","Pre-Rolls"),("vape","Vaporizers"),("cartridge","Vaporizers"),("edible","Edibles"),("gumm","Edibles"),("concentrate","Concentrates"),("tincture","Tinctures")]:
+            if c in lo and len(line) < 50: cat = lb; break
         prices = pp.findall(line)
         if not prices: continue
         price = float(prices[0])
@@ -161,17 +158,17 @@ def parse_md(md):
         nm = re.sub(r'\$[\d.]+','',line).strip()
         nm = re.sub(r'[#*_\[\]()>|]','',nm).strip()
         nm = re.sub(r'\s+',' ',nm).strip()
-        if len(nm) < 3 and i > 0:
-            nm = re.sub(r'[#*_\[\]()>|]','',lines[i-1]).strip()
+        if len(nm) < 3 and i > 0: nm = re.sub(r'[#*_\[\]()>|]','',lines[i-1]).strip()
         if not nm or len(nm) < 3: continue
-        pts = re.split(r'\s*[-–|]\s*', nm, 1)
+        pts = re.split(r'\s*[-\u2013|]\s*', nm, 1)
         brand = pts[0].strip()[:40] if len(pts) > 1 else "Unknown"
         pname = pts[1].strip()[:80] if len(pts) > 1 else nm[:80]
-        products.append({"name": pname, "brand": brand, "category": cat, "price": price, "weight": ""})
+        products.append({"name":pname,"brand":brand,"category":cat,"price":price,"weight":""})
     return products
 
 def scrape(name, url):
     print(f"  -> {name}")
+    print(f"     {url}")
     result = try_extract(name, url)
     if result and result["products"]:
         print(f"     OK: {len(result['products'])} products (extract)")
@@ -181,13 +178,18 @@ def scrape(name, url):
     if result and result["products"]:
         print(f"     OK: {len(result['products'])} products (markdown)")
         return result
-    print(f"     FAILED")
+    print(f"     FAILED: 0 products")
     return None
 
 def build_dash(results):
     pm = {}
     for disp, data in results.items():
         if not data: continue
+        # Normalize Affinity names for dashboard grouping
+        display_name = disp
+        if "Affinity NH" in disp: display_name = "Affinity - New Haven"
+        elif "Affinity BP" in disp: display_name = "Affinity - Bridgeport"
+        menu_type = "(Rec)" if "(Rec)" in disp else "(Med)" if "(Med)" in disp else ""
         for p in data.get("products", []):
             nm = (p.get("name") or "").strip()
             br = (p.get("brand") or "Unknown").strip()
@@ -198,7 +200,13 @@ def build_dash(results):
             key = f"{br}::{nm}".lower()
             if key not in pm:
                 pm[key] = {"name":nm,"brand":br,"category":ct,"weight":wt,"dispensaries":{}}
-            pm[key]["dispensaries"][disp] = round(float(pr), 2)
+            # For Affinity, label rec vs med
+            label = f"{display_name} {menu_type}".strip() if menu_type else display_name
+            # Keep lowest price if same dispensary appears twice
+            if label in pm[key]["dispensaries"]:
+                pm[key]["dispensaries"][label] = min(pm[key]["dispensaries"][label], round(float(pr),2))
+            else:
+                pm[key]["dispensaries"][label] = round(float(pr),2)
     comp = sorted([v for v in pm.values() if len(v["dispensaries"]) >= 2], key=lambda x:(x["category"],x["name"]))
     allp = sorted(pm.values(), key=lambda x:(x["category"],x["name"]))
     out = comp if len(comp) >= 5 else allp
@@ -225,14 +233,14 @@ def main():
         print("ERROR: FIRECRAWL_API_KEY not set"); sys.exit(1)
     init()
     print(f"\n{'='*60}")
-    print(f"  AFFINITY SCRAPER v4 (Firecrawl + Leafly)")
+    print(f"  AFFINITY SCRAPER v5")
     print(f"  {datetime.now().strftime('%Y-%m-%d %H:%M')}")
-    print(f"  {len(STORES)} stores")
+    print(f"  {len(STORES)} pages to scrape")
     print(f"{'='*60}\n")
     results = {}
     for s in STORES:
         results[s["name"]] = scrape(s["name"], s["url"])
-        time.sleep(6)  # 6s between requests to avoid rate limits
+        time.sleep(6)
     dash = build_dash(results)
     print(f"\n{'='*60}")
     for k, v in dash["stats"].items(): print(f"  {k}: {v}")
