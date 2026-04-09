@@ -1,5 +1,5 @@
 {
-  "scraped_at": "2026-04-09T16:34:22.418841",
+  "scraped_at": "2026-04-09T16:53:50.110511",
   "products": [
     {
       "name": "4114/gummies-greener-apple-fast-acting-gummies-20pk-258516?stockType=Default",
@@ -119,6 +119,15 @@
       }
     },
     {
+      "name": "50 dollar an eighth flower. Bull droppings",
+      "brand": "Ridiculous prices on flower. Everything",
+      "category": "Other",
+      "weight": "",
+      "dispensaries": {
+        "RISE Dispensary Orange": 14.0
+      }
+    },
+    {
       "name": "Rolls for https://media-prime.sweedpos.com/store/prime/177558719431ad1575-d3e9-4",
       "brand": "!Cannabis Promo, Cannabis Sales, Cannabi",
       "category": "Other",
@@ -161,6 +170,33 @@
       "weight": "",
       "dispensaries": {
         "Higher Collective Bridgeport": 100.0
+      }
+    },
+    {
+      "name": "\u2022 Sundays: Spend , get 2x points, or spend , get 3x points",
+      "brand": "Unknown",
+      "category": "Other",
+      "weight": "",
+      "dispensaries": {
+        "High Profile Hamden": 200.0
+      }
+    },
+    {
+      "name": "\u2022 off total purchase of on second visit",
+      "brand": "Unknown",
+      "category": "Other",
+      "weight": "",
+      "dispensaries": {
+        "High Profile Hamden": 10.0
+      }
+    },
+    {
+      "name": "\u2022 off total purchase on first visit with High Rollers signup",
+      "brand": "Unknown",
+      "category": "Other",
+      "weight": "",
+      "dispensaries": {
+        "High Profile Hamden": 10.0
       }
     },
     {
@@ -211,11 +247,11 @@
   ],
   "deals": [],
   "stats": {
-    "total": 26,
+    "total": 37,
     "comparable": 0,
-    "all": 23,
-    "success": 1,
-    "failed": 18,
+    "all": 27,
+    "success": 3,
+    "failed": 16,
     "deals": 0
   }
 }
