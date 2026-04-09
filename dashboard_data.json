@@ -1,30 +1,11 @@
-{"scraped_at":"sample","products":[
-{"name":"Kush Mints","brand":"Rhythm","category":"Flower","weight":"3.5g","dispensaries":{"Affinity - New Haven":45,"RISE Dispensary Orange":50,"Fine Fettle Newington":48,"Zen Leaf Meriden":52,"Insa New Haven":47,"Curaleaf Stamford":49}},
-{"name":"Animal Face","brand":"Rhythm","category":"Flower","weight":"3.5g","dispensaries":{"Affinity - New Haven":48,"RISE Dispensary Branford":50,"Fine Fettle Manchester":49,"Zen Leaf Waterbury":51,"Trulieve Bristol":48}},
-{"name":"White Durban","brand":"CT Pharma","category":"Flower","weight":"3.5g","dispensaries":{"Affinity - New Haven":40,"Fine Fettle Newington":44,"Zen Leaf Meriden":43,"Sweetspot West Hartford":42,"Trulieve Bristol":45}},
-{"name":"Cherry AK","brand":"CT Pharma","category":"Flower","weight":"3.5g","dispensaries":{"Affinity - New Haven":38,"RISE Dispensary Orange":42,"Budr Cannabis Stratford":40,"Hi! People Derby":41,"High Profile Hamden":39}},
-{"name":"Grape Noir","brand":"Kind Tree","category":"Flower","weight":"3.5g","dispensaries":{"Affinity - New Haven":35,"Fine Fettle Bristol":38,"Shangri-La Plainville":40,"Nova Farms New Britain":36}},
-{"name":"Lemon Royale","brand":"Rhythm","category":"Flower","weight":"3.5g","dispensaries":{"Affinity - Bridgeport":47,"Higher Collective Bridgeport":50,"Budr Cannabis Stratford":48,"Curaleaf Stamford":51}},
-{"name":"Black Afghan","brand":"Curaleaf","category":"Flower","weight":"3.5g","dispensaries":{"Affinity - New Haven":30,"Curaleaf Manchester":28,"Fine Fettle Willimantic":33,"Zen Leaf Norwich":35}},
-{"name":"Ice Cream Cake","brand":"AGL","category":"Flower","weight":"3.5g","dispensaries":{"Affinity - New Haven":42,"RISE Dispensary Orange":45,"Venu Flower Collective":44,"Lit New Haven Cannabis":43}},
-{"name":"Kush Mints Pre-Roll","brand":"Rhythm","category":"Pre-Rolls","weight":"1g","dispensaries":{"Affinity - New Haven":15,"RISE Dispensary Orange":17,"Fine Fettle Newington":16,"Zen Leaf Meriden":18}},
-{"name":"Dog Walkers 5pk","brand":"Rhythm","category":"Pre-Rolls","weight":"2.5g","dispensaries":{"Affinity - New Haven":30,"RISE Dispensary Branford":35,"Fine Fettle Manchester":33,"Trulieve Bristol":32}},
-{"name":"Kush Mints Cart","brand":"Rhythm","category":"Vaporizers","weight":"0.5g","dispensaries":{"Affinity - New Haven":40,"RISE Dispensary Orange":45,"Fine Fettle Newington":43,"Zen Leaf Meriden":44}},
-{"name":"Live Resin Cart","brand":"Kind Tree","category":"Vaporizers","weight":"0.5g","dispensaries":{"Affinity - New Haven":45,"RISE Dispensary Branford":50,"Higher Collective Bridgeport":48,"Budr Cannabis Vernon":47}},
-{"name":"Disposable Vape","brand":"Curaleaf","category":"Vaporizers","weight":"0.3g","dispensaries":{"Affinity - New Haven":25,"Curaleaf Manchester":22,"Curaleaf Stamford":23,"Zen Leaf Enfield":28}},
-{"name":"Chews 10pk","brand":"Encore","category":"Edibles","weight":"100mg","dispensaries":{"Affinity - New Haven":28,"RISE Dispensary Orange":30,"Fine Fettle Newington":29,"Zen Leaf Meriden":32}},
-{"name":"Gummies 10pk","brand":"Wana","category":"Edibles","weight":"100mg","dispensaries":{"Affinity - New Haven":30,"RISE Dispensary Orange":32,"Fine Fettle Manchester":31,"Trulieve Bristol":33}},
-{"name":"Live Badder","brand":"Rhythm","category":"Concentrates","weight":"1g","dispensaries":{"Affinity - New Haven":60,"RISE Dispensary Orange":65,"Fine Fettle Newington":63,"Zen Leaf Meriden":66}},
-{"name":"THC Tincture","brand":"CT Pharma","category":"Tinctures","weight":"30ml","dispensaries":{"Affinity - New Haven":45,"Fine Fettle Newington":50,"Zen Leaf Meriden":52,"Trulieve Bristol":48}}
-],"deals":[
-{"dispensary":"RISE Dispensary Orange","title":"20% Off All Rhythm Flower","type":"percent","category":"Flower","expires":"2026-04-15"},
-{"dispensary":"Fine Fettle Newington","title":"Buy 2 Get 1 Pre-Roll","type":"bogo","category":"Pre-Rolls","expires":"2026-04-12"},
-{"dispensary":"Zen Leaf Meriden","title":"$5 Off Any Edible","type":"dollar","category":"Edibles","expires":"2026-04-10"},
-{"dispensary":"Curaleaf Stamford","title":"15% Off Vape Carts","type":"percent","category":"Vaporizers","expires":"2026-04-14"},
-{"dispensary":"Trulieve Bristol","title":"First Time Patient 25% Off","type":"percent","category":"All","expires":null},
-{"dispensary":"Higher Collective Bridgeport","title":"Happy Hour 3-5pm 10% Off","type":"percent","category":"All","expires":null},
-{"dispensary":"Sweetspot West Hartford","title":"$30 Eighths Select Strains","type":"flat","category":"Flower","expires":"2026-04-11"},
-{"dispensary":"Shangri-La Plainville","title":"Happy Hour 1-3pm 40% Off","type":"percent","category":"All","expires":null},
-{"dispensary":"Nova Farms New Britain","title":"$10 Off Concentrates","type":"dollar","category":"Concentrates","expires":"2026-04-15"},
-{"dispensary":"Venu Flower Collective","title":"Drive-Thru Special $35 8ths","type":"flat","category":"Flower","expires":"2026-04-14"}
-]}
+{
+  "scraped_at": "2026-04-09T04:44:42.463484",
+  "products": [],
+  "deals": [],
+  "stats": {
+    "total_products_raw": 0,
+    "comparable_products": 0,
+    "dispensaries_with_data": 0,
+    "total_deals": 0
+  }
+}
