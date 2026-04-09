@@ -23,12 +23,12 @@ jobs:
       - name: Install dependencies
         run: pip install requests
 
-      - name: Run Firecrawl scraper
+      - name: Run Hoodie scraper
         working-directory: ./scraper
         env:
-          FIRECRAWL_API_KEY: ${{ secrets.FIRECRAWL_API_KEY }}
+          HOODIE_REFRESH_TOKEN: ${{ secrets.HOODIE_REFRESH_TOKEN }}
         run: python scrape.py
-        timeout-minutes: 20
+        timeout-minutes: 15
 
       - name: Commit updated data
         run: |
