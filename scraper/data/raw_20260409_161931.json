@@ -1,0 +1,721 @@
+{
+  "Affinity - New Haven": null,
+  "Affinity - Bridgeport": null,
+  "Higher Collective Bridgeport": {
+    "products": [
+      {
+        "name": "info/higher-collective-bridgeport/p/648231288/hash-burger-35g-parttimers?variant",
+        "brand": "https://www.leafly.com/dispensary",
+        "category": "Flower",
+        "price": 20.0,
+        "weight": ""
+      },
+      {
+        "name": "info/higher-collective-bridgeport/p/648100587/hash-burger-35g-whole-flower?varia",
+        "brand": "https://www.leafly.com/dispensary",
+        "category": "Flower",
+        "price": 46.0,
+        "weight": ""
+      },
+      {
+        "name": "info/higher-collective-bridgeport/p/648094947/hash-burger--7g-overtimers?variant",
+        "brand": "https://www.leafly.com/dispensary",
+        "category": "Flower",
+        "price": 56.0,
+        "weight": ""
+      },
+      {
+        "name": "info/higher-collective-bridgeport/p/648261971/lemon-fresh-7g-small-flower?varian",
+        "brand": "https://www.leafly.com/dispensary",
+        "category": "Flower",
+        "price": 65.0,
+        "weight": ""
+      },
+      {
+        "name": "info/higher-collective-bridgeport/p/648261977/animal-face-28g-whole-flower?varia",
+        "brand": "https://www.leafly.com/dispensary",
+        "category": "Flower",
+        "price": 180.0,
+        "weight": ""
+      },
+      {
+        "name": "info/higher-collective-bridgeport/p/648261988/living-legend-35g-whole-flower?var",
+        "brand": "https://www.leafly.com/dispensary",
+        "category": "Flower",
+        "price": 25.0,
+        "weight": ""
+      },
+      {
+        "name": "info/higher-collective-bridgeport/p/647815180/peanut-butter-muffin-7g-whole-flow",
+        "brand": "https://www.leafly.com/dispensary",
+        "category": "Flower",
+        "price": 27.0,
+        "weight": ""
+      },
+      {
+        "name": "info/higher-collective-bridgeport/p/647831705/agent-z-7g-whole-flower?variant=31",
+        "brand": "https://www.leafly.com/dispensary",
+        "category": "Flower",
+        "price": 27.0,
+        "weight": ""
+      },
+      {
+        "name": "info/higher-collective-bridgeport/p/647814861/black-cherry-gmo-infused-1g-blunt?",
+        "brand": "https://www.leafly.com/dispensary",
+        "category": "Concentrates",
+        "price": 22.0,
+        "weight": ""
+      },
+      {
+        "name": "info/higher-collective-bridgeport/p/648512679/wedding-cake-infused-1g-blunt?vari",
+        "brand": "https://www.leafly.com/dispensary",
+        "category": "Concentrates",
+        "price": 22.0,
+        "weight": ""
+      },
+      {
+        "name": "info/higher-collective-bridgeport/p/648231292/dos-pasteles-infused-10g-blunt?var",
+        "brand": "https://www.leafly.com/dispensary",
+        "category": "Concentrates",
+        "price": 22.0,
+        "weight": ""
+      },
+      {
+        "name": "info/higher-collective-bridgeport/p/647831717/foreverberry-infused-1g-blunt?vari",
+        "brand": "https://www.leafly.com/dispensary",
+        "category": "Concentrates",
+        "price": 22.0,
+        "weight": ""
+      },
+      {
+        "name": "info/higher-collective-bridgeport/p/649196648/hash-wedding-2g-fatboy?variant=325",
+        "brand": "https://www.leafly.com/dispensary",
+        "category": "Concentrates",
+        "price": 35.0,
+        "weight": ""
+      },
+      {
+        "name": "info/higher-collective-bridgeport/p/648512375/foreverberry-infused-2g-fatboy?var",
+        "brand": "https://www.leafly.com/dispensary",
+        "category": "Concentrates",
+        "price": 35.0,
+        "weight": ""
+      },
+      {
+        "name": "info/higher-collective-bridgeport/p/648231291/space-gello-hash-nugs-35g-infused-",
+        "brand": "https://www.leafly.com/dispensary",
+        "category": "Flower",
+        "price": 52.0,
+        "weight": ""
+      },
+      {
+        "name": "info/higher-collective-bridgeport/p/647815089/10-gs-hash-nugs-35g-infused-flower",
+        "brand": "https://www.leafly.com/dispensary",
+        "category": "Flower",
+        "price": 52.0,
+        "weight": ""
+      },
+      {
+        "name": "info/higher-collective-bridgeport/p/648032511/x-bites-strawberry-20pk-gummies?va",
+        "brand": "https://www.leafly.com/dispensary",
+        "category": "Edibles",
+        "price": 24.0,
+        "weight": ""
+      },
+      {
+        "name": "info/higher-collective-bridgeport/p/647815297/raspberry-orange-lime-5mg-gummies?",
+        "brand": "https://www.leafly.com/dispensary",
+        "category": "Edibles",
+        "price": 30.0,
+        "weight": ""
+      },
+      {
+        "name": "info/higher-collective-bridgeport/p/648934854/x-bites-orange-matter-20pk-gummies",
+        "brand": "https://www.leafly.com/dispensary",
+        "category": "Edibles",
+        "price": 30.0,
+        "weight": ""
+      },
+      {
+        "name": "info/higher-collective-bridgeport/p/647992044/passionfruit-pineapple-111-20pk-gu",
+        "brand": "https://www.leafly.com/dispensary",
+        "category": "Edibles",
+        "price": 32.0,
+        "weight": ""
+      },
+      {
+        "name": "info/higher-collective-bridgeport/p/647992053/classic-dream-berry-20pk-gummies?v",
+        "brand": "https://www.leafly.com/dispensary",
+        "category": "Edibles",
+        "price": 32.0,
+        "weight": ""
+      },
+      {
+        "name": "info/higher-collective-bridgeport/p/648167446/classic-blueberry-20pk-gummies?var",
+        "brand": "https://www.leafly.com/dispensary",
+        "category": "Edibles",
+        "price": 32.0,
+        "weight": ""
+      },
+      {
+        "name": "info/higher-collective-bridgeport/p/647992045/quick-island-punch-20pk-gummies?va",
+        "brand": "https://www.leafly.com/dispensary",
+        "category": "Edibles",
+        "price": 34.0,
+        "weight": ""
+      },
+      {
+        "name": "info/higher-collective-bridgeport/p/647992046/quick-limoncello-20pk-gummies?vari",
+        "brand": "https://www.leafly.com/dispensary",
+        "category": "Edibles",
+        "price": 34.0,
+        "weight": ""
+      },
+      {
+        "name": "info/higher-collective-bridgeport/p/648946168/cereal-milk-05g-cartridge?variant=",
+        "brand": "https://www.leafly.com/dispensary",
+        "category": "Vaporizers",
+        "price": 25.0,
+        "weight": ""
+      },
+      {
+        "name": "info/higher-collective-bridgeport/p/647814785/brownie-scout-05g-cartridge?varian",
+        "brand": "https://www.leafly.com/dispensary",
+        "category": "Vaporizers",
+        "price": 25.0,
+        "weight": ""
+      },
+      {
+        "name": "info/higher-collective-bridgeport/p/648428219/95-cookies-05g-cartridge?variant=3",
+        "brand": "https://www.leafly.com/dispensary",
+        "category": "Vaporizers",
+        "price": 25.0,
+        "weight": ""
+      },
+      {
+        "name": "info/higher-collective-bridgeport/p/648718712/cheddar-cheeze-05g-cartridge?varia",
+        "brand": "https://www.leafly.com/dispensary",
+        "category": "Vaporizers",
+        "price": 25.0,
+        "weight": ""
+      },
+      {
+        "name": "info/higher-collective-bridgeport/p/648982200/purple-tyde-05g-cartridge?variant=",
+        "brand": "https://www.leafly.com/dispensary",
+        "category": "Vaporizers",
+        "price": 25.0,
+        "weight": ""
+      },
+      {
+        "name": "info/higher-collective-bridgeport/p/648718708/chicken-n-waffles-05g-cartridge?va",
+        "brand": "https://www.leafly.com/dispensary",
+        "category": "Vaporizers",
+        "price": 25.0,
+        "weight": ""
+      },
+      {
+        "name": "info/higher-collective-bridgeport/p/648946169/dulce-de-uva-05g-cartridge?variant",
+        "brand": "https://www.leafly.com/dispensary",
+        "category": "Vaporizers",
+        "price": 30.0,
+        "weight": ""
+      },
+      {
+        "name": "info/higher-collective-bridgeport/p/649216463/dream-clouds-05g-cartridge?variant",
+        "brand": "https://www.leafly.com/dispensary",
+        "category": "Vaporizers",
+        "price": 30.0,
+        "weight": ""
+      },
+      {
+        "name": "info/higher-collective-bridgeport/p/648720616/hash-burger-1g-pre-roll?variant=32",
+        "brand": "https://www.leafly.com/dispensary",
+        "category": "Pre-Rolls",
+        "price": 14.0,
+        "weight": ""
+      },
+      {
+        "name": "info/higher-collective-bridgeport/p/648683233/hash-burger-pre-roll-16g-shorties?",
+        "brand": "https://www.leafly.com/dispensary",
+        "category": "Pre-Rolls",
+        "price": 29.0,
+        "weight": ""
+      },
+      {
+        "name": "info/higher-collective-bridgeport/p/648720617/hash-burger-5pk-shorties?variant=3",
+        "brand": "https://www.leafly.com/dispensary",
+        "category": "Pre-Rolls",
+        "price": 39.0,
+        "weight": ""
+      },
+      {
+        "name": "info/higher-collective-bridgeport/p/648097724/hash-burger-rosin-roll-16g-infused",
+        "brand": "https://www.leafly.com/dispensary",
+        "category": "Pre-Rolls",
+        "price": 42.0,
+        "weight": ""
+      },
+      {
+        "name": "info/higher-collective-bridgeport/p/648934855/critical-crumb-1g-pre-roll?variant",
+        "brand": "https://www.leafly.com/dispensary",
+        "category": "Pre-Rolls",
+        "price": 10.0,
+        "weight": ""
+      },
+      {
+        "name": "info/higher-collective-bridgeport/p/648184381/peanut-butter-bites-1g-pre-roll?va",
+        "brand": "https://www.leafly.com/dispensary",
+        "category": "Pre-Rolls",
+        "price": 10.0,
+        "weight": ""
+      },
+      {
+        "name": "info/higher-collective-bridgeport/p/649252016/slingria-1g-pre-roll?variant=32618",
+        "brand": "https://www.leafly.com/dispensary",
+        "category": "Pre-Rolls",
+        "price": 10.0,
+        "weight": ""
+      },
+      {
+        "name": "info/higher-collective-bridgeport/p/648261982/black-maple-22-1g-big-dog?variant=",
+        "brand": "https://www.leafly.com/dispensary",
+        "category": "Pre-Rolls",
+        "price": 11.0,
+        "weight": ""
+      },
+      {
+        "name": "info/higher-collective-bridgeport/p/647815076/510-battery?variant=3157549790 add",
+        "brand": "https://www.leafly.com/dispensary",
+        "category": "Pre-Rolls",
+        "price": 10.0,
+        "weight": ""
+      },
+      {
+        "name": "info/higher-collective-bridgeport/p/647814994/cbg-isolate-mood-tincture-1800mg?v",
+        "brand": "https://www.leafly.com/dispensary",
+        "category": "Tinctures",
+        "price": 60.0,
+        "weight": ""
+      },
+      {
+        "name": "info/higher-collective-bridgeport/p/648014463/watermelon-3mg-seltzer?variant=316",
+        "brand": "https://www.leafly.com/dispensary",
+        "category": "Tinctures",
+        "price": 6.0,
+        "weight": ""
+      },
+      {
+        "name": "info/higher-collective-bridgeport/p/647815106/classic-3mg-lemonade?variant=31575",
+        "brand": "https://www.leafly.com/dispensary",
+        "category": "Tinctures",
+        "price": 6.0,
+        "weight": ""
+      },
+      {
+        "name": "info/higher-collective-bridgeport/p/647815211/prickly-pear-3mg-lemonade?variant=",
+        "brand": "https://www.leafly.com/dispensary",
+        "category": "Tinctures",
+        "price": 6.0,
+        "weight": ""
+      },
+      {
+        "name": "info/higher-collective-bridgeport/p/647815105/raspberry-3mg-lemonade?variant=315",
+        "brand": "https://www.leafly.com/dispensary",
+        "category": "Tinctures",
+        "price": 6.0,
+        "weight": ""
+      },
+      {
+        "name": "info/higher-collective-bridgeport/p/649033389/punch-3mg?variant=3244250173 add t",
+        "brand": "https://www.leafly.com/dispensary",
+        "category": "Tinctures",
+        "price": 6.0,
+        "weight": ""
+      },
+      {
+        "name": "info/higher-collective-bridgeport/p/648014464/mango-3mg-seltzer?variant=31694592",
+        "brand": "https://www.leafly.com/dispensary",
+        "category": "Tinctures",
+        "price": 6.0,
+        "weight": ""
+      },
+      {
+        "name": "info/higher-collective-bridgeport/p/647815165/lemonade-3mg?variant=3157549967 ad",
+        "brand": "https://www.leafly.com/dispensary",
+        "category": "Tinctures",
+        "price": 6.0,
+        "weight": ""
+      },
+      {
+        "name": "Higher Collective is proud to offer High Fliers Rewards, a customer loyalty prog",
+        "brand": "Unknown",
+        "category": "Tinctures",
+        "price": 75.0,
+        "weight": ""
+      }
+    ],
+    "deals": []
+  },
+  "Lit New Haven Cannabis": {
+    "products": [
+      {
+        "name": "info/lit-new-haven/p/648288572/lets-burn-hash-burger-35g-0013?variant=3189316324",
+        "brand": "https://www.leafly.com/dispensary",
+        "category": "Flower",
+        "price": 48.0,
+        "weight": ""
+      },
+      {
+        "name": "info/lit-new-haven/p/648246687/grassroots-ground-flower-35g-pineapple-sunrise-s-",
+        "brand": "https://www.leafly.com/dispensary",
+        "category": "Flower",
+        "price": 25.0,
+        "weight": ""
+      },
+      {
+        "name": "info/lit-new-haven/p/648096808/good-green-35g-living-legend-s-01125?variant=3173",
+        "brand": "https://www.leafly.com/dispensary",
+        "category": "Flower",
+        "price": 25.0,
+        "weight": ""
+      },
+      {
+        "name": "info/lit-new-haven/p/647745671/grassroots-whole-flower-35g-white-caps-i-01383-tc",
+        "brand": "https://www.leafly.com/dispensary",
+        "category": "Flower",
+        "price": 40.0,
+        "weight": ""
+      },
+      {
+        "name": "info/lit-new-haven/p/645885671/rythm-7g-small-flower--animal-face-i-01333?varian",
+        "brand": "https://www.leafly.com/dispensary",
+        "category": "Flower",
+        "price": 65.0,
+        "weight": ""
+      },
+      {
+        "name": "info/lit-new-haven/p/648716510/mendo-wedding-flower-i-26561?variant=3222246419 a",
+        "brand": "https://www.leafly.com/dispensary",
+        "category": "Flower",
+        "price": 45.0,
+        "weight": ""
+      },
+      {
+        "name": "info/lit-new-haven/p/647285794/afgooey-lil-budz-7g-i-00445?variant=3119423612 ad",
+        "brand": "https://www.leafly.com/dispensary",
+        "category": "Flower",
+        "price": 55.0,
+        "weight": ""
+      },
+      {
+        "name": "info/lit-new-haven/p/649190503/lets-burn-yeet-35g-0020?variant=3255612518 add to",
+        "brand": "https://www.leafly.com/dispensary",
+        "category": "Flower",
+        "price": 31.0,
+        "weight": ""
+      },
+      {
+        "name": "info/lit-new-haven/p/647634243/allhours-air-hdz-hash-nugs-41504?variant=31462765",
+        "brand": "https://www.leafly.com/dispensary",
+        "category": "Concentrates",
+        "price": 60.0,
+        "weight": ""
+      },
+      {
+        "name": "info/lit-new-haven/p/645738105/hi5--blueberry-lemonade--thc-seltzer--beverage--1",
+        "brand": "https://www.leafly.com/dispensary",
+        "category": "Edibles",
+        "price": 5.0,
+        "weight": ""
+      },
+      {
+        "name": "info/lit-new-haven/p/645738108/hi5--black-cherry--thc-seltzer--beverage--12oz?va",
+        "brand": "https://www.leafly.com/dispensary",
+        "category": "Edibles",
+        "price": 5.0,
+        "weight": ""
+      },
+      {
+        "name": "info/lit-new-haven/p/645738109/hi5--peach-mango--thc-seltzer--beverage--12oz?var",
+        "brand": "https://www.leafly.com/dispensary",
+        "category": "Edibles",
+        "price": 5.0,
+        "weight": ""
+      },
+      {
+        "name": "info/lit-new-haven/p/648716507/on-the-rocks-live-rosin-sour-apricot-apple-gummie",
+        "brand": "https://www.leafly.com/dispensary",
+        "category": "Edibles",
+        "price": 28.0,
+        "weight": ""
+      },
+      {
+        "name": "info/lit-new-haven/p/649187845/camino-pineapple-habanero-cannabis-infused-gummie",
+        "brand": "https://www.leafly.com/dispensary",
+        "category": "Edibles",
+        "price": 32.0,
+        "weight": ""
+      },
+      {
+        "name": "info/lit-new-haven/p/649187843/camino-sours-watermelon-spritz-cannabis-infused-g",
+        "brand": "https://www.leafly.com/dispensary",
+        "category": "Edibles",
+        "price": 32.0,
+        "weight": ""
+      },
+      {
+        "name": "info/lit-new-haven/p/649187842/camino-watermelon-lemonade-cannabis-infused-gummi",
+        "brand": "https://www.leafly.com/dispensary",
+        "category": "Edibles",
+        "price": 32.0,
+        "weight": ""
+      },
+      {
+        "name": "info/lit-new-haven/p/643458982/camino-wild-berry-cannabis-infused-gummies-00396?",
+        "brand": "https://www.leafly.com/dispensary",
+        "category": "Edibles",
+        "price": 32.0,
+        "weight": ""
+      },
+      {
+        "name": "info/lit-new-haven/p/647092183/rythm-05g-vape-afternoon-delight-h-01347?variant=",
+        "brand": "https://www.leafly.com/dispensary",
+        "category": "Vaporizers",
+        "price": 25.0,
+        "weight": ""
+      },
+      {
+        "name": "info/lit-new-haven/p/649222433/rythm-05g-vape-dulce-de-uva-i-01339?variant=32575",
+        "brand": "https://www.leafly.com/dispensary",
+        "category": "Vaporizers",
+        "price": 25.0,
+        "weight": ""
+      },
+      {
+        "name": "info/lit-new-haven/p/649229200/select-flavor-series-510-5g-banana-cream-cayk-h-0",
+        "brand": "https://www.leafly.com/dispensary",
+        "category": "Vaporizers",
+        "price": 40.0,
+        "weight": ""
+      },
+      {
+        "name": "info/lit-new-haven/p/647308034/select-elite-cartridge-5g-cherry-bmb-s-01296?vari",
+        "brand": "https://www.leafly.com/dispensary",
+        "category": "Vaporizers",
+        "price": 45.0,
+        "weight": ""
+      },
+      {
+        "name": "info/lit-new-haven/p/648246693/select-elite-cartridge-5g-dosido-i-01479?variant=",
+        "brand": "https://www.leafly.com/dispensary",
+        "category": "Vaporizers",
+        "price": 45.0,
+        "weight": ""
+      },
+      {
+        "name": "info/lit-new-haven/p/647745677/select-elite-cartridge-5g-durban-poison-s-01293?v",
+        "brand": "https://www.leafly.com/dispensary",
+        "category": "Vaporizers",
+        "price": 45.0,
+        "weight": ""
+      },
+      {
+        "name": "info/lit-new-haven/p/649222432/rythm-05g-live-rosin-vape-bananaconda-h-01392?var",
+        "brand": "https://www.leafly.com/dispensary",
+        "category": "Vaporizers",
+        "price": 45.0,
+        "weight": ""
+      },
+      {
+        "name": "info/lit-new-haven/p/645790053/select-elite-cartridge-5g-orange-kookyz-s-01389?v",
+        "brand": "https://www.leafly.com/dispensary",
+        "category": "Vaporizers",
+        "price": 45.0,
+        "weight": ""
+      },
+      {
+        "name": "info/lit-new-haven/p/648737615/lets-burn-hash-burger-1g-pr-0017?variant=32237631",
+        "brand": "https://www.leafly.com/dispensary",
+        "category": "Pre-Rolls",
+        "price": 14.0,
+        "weight": ""
+      },
+      {
+        "name": "info/lit-new-haven/p/648772561/find-preroll-1g-single-modified-goat-i-01538-tc-3",
+        "brand": "https://www.leafly.com/dispensary",
+        "category": "Pre-Rolls",
+        "price": 16.0,
+        "weight": ""
+      },
+      {
+        "name": "info/lit-new-haven/p/648772553/dark-heart-collection-preroll-5-pack-2g-titan-exp",
+        "brand": "https://www.leafly.com/dispensary",
+        "category": "Pre-Rolls",
+        "price": 30.0,
+        "weight": ""
+      },
+      {
+        "name": "info/lit-new-haven/p/648246688/grassroots-preroll-5-pack-2g-apple-tartz-h-01598-",
+        "brand": "https://www.leafly.com/dispensary",
+        "category": "Pre-Rolls",
+        "price": 34.0,
+        "weight": ""
+      },
+      {
+        "name": "info/lit-new-haven/p/649229201/dark-heart-collection-preroll-5-pack-2g-foreign-k",
+        "brand": "https://www.leafly.com/dispensary",
+        "category": "Pre-Rolls",
+        "price": 34.0,
+        "weight": ""
+      },
+      {
+        "name": "info/lit-new-haven/p/643429286/savvy-seattle-sour-kush-1g-pre-roll-s-26863?varia",
+        "brand": "https://www.leafly.com/dispensary",
+        "category": "Pre-Rolls",
+        "price": 14.0,
+        "weight": ""
+      },
+      {
+        "name": "info/lit-new-haven/p/647092178/agl-5-pack-minis-paradise-snacks-i-01360?variant=",
+        "brand": "https://www.leafly.com/dispensary",
+        "category": "Pre-Rolls",
+        "price": 30.0,
+        "weight": ""
+      },
+      {
+        "name": "info/lit-new-haven/p/648737616/lets-burn-hi-life-1g-pre-roll-0031?variant=322376",
+        "brand": "https://www.leafly.com/dispensary",
+        "category": "Pre-Rolls",
+        "price": 12.0,
+        "weight": ""
+      },
+      {
+        "name": "info/lit-new-haven/p/642675812/lit--coffee-mug--accessories?variant=2836233206 a",
+        "brand": "https://www.leafly.com/dispensary",
+        "category": "Pre-Rolls",
+        "price": 10.0,
+        "weight": ""
+      },
+      {
+        "name": "info/lit-new-haven/p/642959657/lit--rolling-tray-small--accessories?variant=2851",
+        "brand": "https://www.leafly.com/dispensary",
+        "category": "Pre-Rolls",
+        "price": 10.0,
+        "weight": ""
+      },
+      {
+        "name": "info/lit-new-haven/p/642655579/friday-forward-journal-a-52-week-journal-to-drive",
+        "brand": "https://www.leafly.com/dispensary",
+        "category": "Pre-Rolls",
+        "price": 12.99,
+        "weight": ""
+      },
+      {
+        "name": "info/lit-new-haven/p/646210532/crossland-x-lit--cuff-beanie--black?variant=30568",
+        "brand": "https://www.leafly.com/dispensary",
+        "category": "Pre-Rolls",
+        "price": 15.0,
+        "weight": ""
+      },
+      {
+        "name": "info/lit-new-haven/p/642905574/lit--aop-socks--heather-grey?variant=2849481714 a",
+        "brand": "https://www.leafly.com/dispensary",
+        "category": "Pre-Rolls",
+        "price": 15.0,
+        "weight": ""
+      },
+      {
+        "name": "info/lit-new-haven/p/642905575/lit--aop-socks--grey?variant=2849481715 add to ca",
+        "brand": "https://www.leafly.com/dispensary",
+        "category": "Pre-Rolls",
+        "price": 15.0,
+        "weight": ""
+      },
+      {
+        "name": "info/lit-new-haven/p/642586864/lit--tee--t-shirts--blkred-3xl?variant=2830191006",
+        "brand": "https://www.leafly.com/dispensary",
+        "category": "Pre-Rolls",
+        "price": 25.0,
+        "weight": ""
+      },
+      {
+        "name": "info/lit-new-haven/p/642595237/lit--tee--t-shirts--tan-3xl?variant=2830829983 ad",
+        "brand": "https://www.leafly.com/dispensary",
+        "category": "Pre-Rolls",
+        "price": 25.0,
+        "weight": ""
+      },
+      {
+        "name": "info/lit-new-haven/p/642595250/lit--tee--t-shirts--green-s?variant=2830830007 ad",
+        "brand": "https://www.leafly.com/dispensary",
+        "category": "Pre-Rolls",
+        "price": 25.0,
+        "weight": ""
+      },
+      {
+        "name": "info/lit-new-haven/p/642595251/lit--tee--t-shirts--green-xl?variant=2830830008 a",
+        "brand": "https://www.leafly.com/dispensary",
+        "category": "Pre-Rolls",
+        "price": 25.0,
+        "weight": ""
+      },
+      {
+        "name": "info/lit-new-haven/p/643586862/lit--tee--t-shirts--blkwhite-2xl?variant=28914545",
+        "brand": "https://www.leafly.com/dispensary",
+        "category": "Pre-Rolls",
+        "price": 25.0,
+        "weight": ""
+      }
+    ],
+    "deals": []
+  },
+  "Insa New Haven": {
+    "products": [
+      {
+        "name": "DEALS ! Amazing products got gummies today buy 1 get 1 free 100 MG. Wild Brand !",
+        "brand": "Unknown",
+        "category": "Other",
+        "price": 40.0,
+        "weight": ""
+      },
+      {
+        "name": "I took advantage of an incredible sale through Leafly for an ounce of high quali",
+        "brand": "Unknown",
+        "category": "Flower",
+        "price": 80.0,
+        "weight": ""
+      }
+    ],
+    "deals": []
+  },
+  "RISE Dispensary Orange": {
+    "products": [
+      {
+        "name": "DEALS ! Amazing products got gummies today buy 1 get 1 free 100 MG. Wild Brand !",
+        "brand": "Unknown",
+        "category": "Other",
+        "price": 40.0,
+        "weight": ""
+      },
+      {
+        "name": "I took advantage of an incredible sale through Leafly for an ounce of high quali",
+        "brand": "Unknown",
+        "category": "Flower",
+        "price": 80.0,
+        "weight": ""
+      }
+    ],
+    "deals": []
+  },
+  "High Profile Hamden": null,
+  "Hi! People Derby": null,
+  "Budr Cannabis Stratford": null,
+  "RISE Dispensary Branford": null,
+  "Zen Leaf Naugatuck": null,
+  "Zen Leaf Meriden": null,
+  "Curaleaf Stamford": null,
+  "Sweetspot Stamford": null,
+  "Fine Fettle Newington": null,
+  "Shangri-La Waterbury": null,
+  "Rejoice Seymour": null
+}
