@@ -1,64 +1,55 @@
 #!/usr/bin/env python3
 """
-AFFINITY COMPETITIVE INTEL — Firecrawl Scraper
-Scrapes the 15 closest competitor dispensary menus using Firecrawl API.
-Firecrawl handles JS rendering, anti-bot, and extracts structured data via AI.
-
-Usage:
-    FIRECRAWL_API_KEY=fc-xxx python scrape.py
+AFFINITY COMPETITIVE INTEL — Firecrawl Scraper v2
 """
 
 import json
 import os
 import sys
 import time
+import re
 import requests
 from datetime import datetime
 
 FIRECRAWL_API = "https://api.firecrawl.dev/v2/scrape"
 API_KEY = os.environ.get("FIRECRAWL_API_KEY", "")
 
-# ─── YOUR STORES (scraped for price comparison baseline) ──
 AFFINITY_STORES = [
-    {"name": "Affinity - New Haven", "url": "https://weedmaps.com/dispensaries/affinity-new-haven"},
-    {"name": "Affinity - Bridgeport", "url": "https://weedmaps.com/dispensaries/affinity-dispensary-bridgeport"},
+    {"name": "Affinity - New Haven", "url": "https://affinitydispensary.com/new-haven-menu/"},
+    {"name": "Affinity - Bridgeport", "url": "https://affinitydispensary.com/bridgeport-menu/"},
 ]
 
-# ─── 15 CLOSEST COMPETITORS (sorted by distance to either Affinity location) ──
 COMPETITORS = [
-    {"name": "Higher Collective Bridgeport", "url": "https://weedmaps.com/dispensaries/higher-collective-3", "lat": 41.1547, "lng": -73.2353, "chain": "Higher Collective"},
-    {"name": "Lit New Haven Cannabis", "url": "https://weedmaps.com/dispensaries/lit-new-haven-cannabis", "lat": 41.3029, "lng": -72.9103, "chain": "Lit"},
-    {"name": "Insa New Haven", "url": "https://dutchie.com/dispensary/insa-new-haven", "lat": 41.2942, "lng": -72.9227, "chain": "Insa"},
-    {"name": "RISE Dispensary Orange", "url": "https://dutchie.com/dispensary/rise-orange", "lat": 41.2727, "lng": -72.9951, "chain": "RISE"},
-    {"name": "High Profile Hamden", "url": "https://dutchie.com/dispensary/high-profile-hamden", "lat": 41.3912, "lng": -72.8978, "chain": "High Profile"},
-    {"name": "Hi! People Derby", "url": "https://weedmaps.com/dispensaries/hi-people-derby", "lat": 41.3276, "lng": -73.0847, "chain": "Hi! People"},
-    {"name": "Rejoice Seymour", "url": "https://weedmaps.com/dispensaries/rejoice-dispensary-seymour", "lat": 41.3976, "lng": -73.0619, "chain": "Rejoice"},
-    {"name": "Budr Cannabis Stratford", "url": "https://weedmaps.com/dispensaries/budr-cannabis-stratford", "lat": 41.2539, "lng": -73.1011, "chain": "Budr"},
-    {"name": "RISE Dispensary Branford", "url": "https://dutchie.com/dispensary/rise-branford", "lat": 41.2979, "lng": -72.773, "chain": "RISE"},
-    {"name": "Zen Leaf Naugatuck", "url": "https://weedmaps.com/dispensaries/zen-leaf-cannabis-dispensary-naugatuck", "lat": 41.4786, "lng": -73.0482, "chain": "Zen Leaf"},
-    {"name": "Shangri-La Waterbury", "url": "https://weedmaps.com/dispensaries/shangri-la-dispensary-waterbury", "lat": 41.5355, "lng": -72.9978, "chain": "Shangri-La"},
-    {"name": "Zen Leaf Meriden", "url": "https://weedmaps.com/dispensaries/zen-leaf-cannabis-dispensary-meriden-2", "lat": 41.5253, "lng": -72.7569, "chain": "Zen Leaf"},
-    {"name": "Curaleaf Stamford", "url": "https://dutchie.com/dispensary/curaleaf-ct-stamford", "lat": 41.0559, "lng": -73.5279, "chain": "Curaleaf"},
-    {"name": "Sweetspot Stamford", "url": "https://dutchie.com/dispensary/sweetspot-cannabis-dispensary-stamford", "lat": 41.0759, "lng": -73.549, "chain": "Sweetspot"},
-    {"name": "Fine Fettle Newington", "url": "https://dutchie.com/dispensary/fine-fettle-newington", "lat": 41.6905, "lng": -72.7054, "chain": "Fine Fettle"},
+    {"name": "Higher Collective Bridgeport", "url": "https://highercollectivect.com/bridgeport-menu/"},
+    {"name": "Lit New Haven Cannabis", "url": "https://www.litnhv.com/menu"},
+    {"name": "Insa New Haven", "url": "https://www.insacannabis.com/dispensaries/new-haven-ct"},
+    {"name": "RISE Dispensary Orange", "url": "https://risecannabis.com/dispensaries/connecticut/orange"},
+    {"name": "High Profile Hamden", "url": "https://highprofilecannabisnow.com/locations/hamden-ct"},
+    {"name": "Hi! People Derby", "url": "https://hipeople.co/derby"},
+    {"name": "Rejoice Seymour", "url": "https://rejoicedispensary.com/seymour"},
+    {"name": "Budr Cannabis Stratford", "url": "https://www.budr.com/stratford"},
+    {"name": "RISE Dispensary Branford", "url": "https://risecannabis.com/dispensaries/connecticut/branford"},
+    {"name": "Zen Leaf Naugatuck", "url": "https://zenleafdispensaries.com/location/naugatuck-ct"},
+    {"name": "Shangri-La Waterbury", "url": "https://www.shangriladispensary.com/waterbury-menu"},
+    {"name": "Zen Leaf Meriden", "url": "https://zenleafdispensaries.com/location/meriden-ct"},
+    {"name": "Curaleaf Stamford", "url": "https://curaleaf.com/locations/connecticut/curaleaf-ct-stamford"},
+    {"name": "Sweetspot Stamford", "url": "https://sweetspotfarms.com/stamford-menu"},
+    {"name": "Fine Fettle Newington", "url": "https://finefettle.com/locations/newington"},
 ]
 
-# Schema tells Firecrawl exactly what data structure to extract
 EXTRACT_SCHEMA = {
     "type": "object",
     "properties": {
-        "dispensary_name": {"type": "string"},
         "products": {
             "type": "array",
             "items": {
                 "type": "object",
                 "properties": {
-                    "name": {"type": "string", "description": "Product name"},
-                    "brand": {"type": "string", "description": "Brand or grower name"},
-                    "category": {"type": "string", "description": "Category: Flower, Pre-Rolls, Vaporizers, Edibles, Concentrates, Tinctures, or Topicals"},
-                    "price": {"type": "number", "description": "Price in dollars (lowest/default price shown)"},
-                    "weight": {"type": "string", "description": "Weight or size (e.g. 3.5g, 1g, 0.5g, 100mg)"},
-                    "strain_type": {"type": "string", "description": "Indica, Sativa, Hybrid, or empty"},
+                    "name": {"type": "string"},
+                    "brand": {"type": "string"},
+                    "category": {"type": "string"},
+                    "price": {"type": "number"},
+                    "weight": {"type": "string"},
                 },
                 "required": ["name", "price"],
             },
@@ -68,9 +59,8 @@ EXTRACT_SCHEMA = {
             "items": {
                 "type": "object",
                 "properties": {
-                    "title": {"type": "string", "description": "Deal or special name"},
-                    "description": {"type": "string"},
-                    "discount_type": {"type": "string", "description": "percent, dollar, bogo, or other"},
+                    "title": {"type": "string"},
+                    "discount_type": {"type": "string"},
                     "category": {"type": "string"},
                 },
             },
@@ -80,17 +70,14 @@ EXTRACT_SCHEMA = {
 }
 
 EXTRACT_PROMPT = (
-    "Extract ALL cannabis products visible on this dispensary menu page. "
-    "For each product, get the name, brand, category (Flower, Pre-Rolls, Vaporizers, Edibles, Concentrates, Tinctures, Topicals), "
-    "the displayed price in dollars, and weight/size. "
-    "Also extract any deals, specials, or promotions currently shown. "
-    "Get as many products as you can see on the page."
+    "Extract ALL cannabis products from this dispensary menu page. "
+    "For each product get: name, brand, category (Flower/Pre-Rolls/Vaporizers/Edibles/Concentrates/Tinctures), "
+    "price in dollars, and weight. Also extract any deals or specials shown."
 )
 
 
 def scrape_dispensary(name, url):
-    """Scrape a single dispensary using Firecrawl."""
-    print(f"  → Scraping {name}...")
+    print(f"  -> Scraping {name}...")
 
     headers = {
         "Authorization": f"Bearer {API_KEY}",
@@ -104,112 +91,144 @@ def scrape_dispensary(name, url):
             "schema": EXTRACT_SCHEMA,
             "prompt": EXTRACT_PROMPT,
         },
-        "timeout": 60000,
-        "waitFor": 5000,
     }
 
     try:
         resp = requests.post(FIRECRAWL_API, json=payload, headers=headers, timeout=90)
 
         if resp.status_code == 402:
-            print(f"  ✗ {name}: Out of Firecrawl credits")
+            print(f"  X {name}: Out of credits")
             return None
         if resp.status_code == 429:
-            print(f"  ✗ {name}: Rate limited — waiting 30s")
+            print(f"  X {name}: Rate limited, waiting 30s...")
             time.sleep(30)
             resp = requests.post(FIRECRAWL_API, json=payload, headers=headers, timeout=90)
+        if resp.status_code != 200:
+            try:
+                err = resp.json()
+                print(f"  X {name}: HTTP {resp.status_code} -> {json.dumps(err)[:300]}")
+            except Exception:
+                print(f"  X {name}: HTTP {resp.status_code} -> {resp.text[:300]}")
+            return scrape_fallback(name, url, headers)
 
-        resp.raise_for_status()
         data = resp.json()
-
         if not data.get("success"):
-            print(f"  ✗ {name}: Firecrawl returned success=false")
-            return None
+            print(f"  X {name}: success=false -> {data.get('error','unknown')}")
+            return scrape_fallback(name, url, headers)
 
         extract = data.get("data", {}).get("extract", {})
         products = extract.get("products", [])
         deals = extract.get("deals", [])
-
-        # Filter out products with no price or no name
         products = [p for p in products if p.get("name") and p.get("price") and p["price"] > 0]
-
-        print(f"  ✓ {name}: {len(products)} products, {len(deals)} deals")
+        print(f"  OK {name}: {len(products)} products, {len(deals)} deals")
         return {"products": products, "deals": deals}
 
     except requests.exceptions.Timeout:
-        print(f"  ✗ {name}: Timeout")
-        return None
-    except requests.exceptions.HTTPError as e:
-        print(f"  ✗ {name}: HTTP {e.response.status_code}")
+        print(f"  X {name}: Timeout")
         return None
     except Exception as e:
-        print(f"  ✗ {name}: {e}")
+        print(f"  X {name}: {type(e).__name__}: {e}")
         return None
+
+
+def scrape_fallback(name, url, headers):
+    print(f"  .. {name}: Trying markdown fallback...")
+    payload = {"url": url, "formats": ["markdown"]}
+    try:
+        resp = requests.post(FIRECRAWL_API, json=payload, headers=headers, timeout=90)
+        if resp.status_code != 200:
+            print(f"  X {name}: Fallback HTTP {resp.status_code}")
+            return None
+        data = resp.json()
+        if not data.get("success"):
+            print(f"  X {name}: Fallback failed")
+            return None
+        md = data.get("data", {}).get("markdown", "")
+        if not md:
+            print(f"  X {name}: No markdown")
+            return None
+        products = parse_markdown_products(md)
+        print(f"  OK {name}: {len(products)} products (markdown)")
+        return {"products": products, "deals": []}
+    except Exception as e:
+        print(f"  X {name}: Fallback error: {e}")
+        return None
+
+
+def parse_markdown_products(md):
+    products = []
+    lines = md.split("\n")
+    price_pat = re.compile(r'\$(\d+\.?\d*)')
+    current_cat = "Other"
+    for i, line in enumerate(lines):
+        line = line.strip()
+        if not line:
+            continue
+        lower = line.lower()
+        for cat in ["flower","pre-roll","vaporizer","vape","edible","concentrate","tincture"]:
+            if cat in lower and len(line) < 40:
+                cat_map = {"vape":"Vaporizers","pre-roll":"Pre-Rolls","edible":"Edibles",
+                           "concentrate":"Concentrates","tincture":"Tinctures","flower":"Flower","vaporizer":"Vaporizers"}
+                current_cat = cat_map.get(cat, cat.title())
+                break
+        prices = price_pat.findall(line)
+        if prices:
+            price = float(prices[0])
+            if 5 <= price <= 500:
+                name_line = re.sub(r'\$[\d.]+','',line).strip()
+                name_line = re.sub(r'[#*_\[\]()]','',name_line).strip()
+                if len(name_line) < 3 and i > 0:
+                    name_line = re.sub(r'[#*_\[\]()]','',lines[i-1]).strip()
+                if name_line and len(name_line) >= 3:
+                    parts = re.split(r'[-|]', name_line, 1)
+                    brand = parts[0].strip() if len(parts) > 1 else "Unknown"
+                    name = parts[1].strip() if len(parts) > 1 else name_line
+                    products.append({"name":name[:80],"brand":brand[:40],"category":current_cat,"price":price,"weight":""})
+    return products
 
 
 def build_dashboard_data(results):
-    """Convert all scrape results into dashboard JSON format."""
     product_map = {}
-
-    for comp_name, data in results.items():
+    for disp_name, data in results.items():
         if data is None:
             continue
         for p in data.get("products", []):
-            name = p.get("name", "").strip()
-            brand = p.get("brand", "Unknown").strip() if p.get("brand") else "Unknown"
-            category = p.get("category", "Other").strip() if p.get("category") else "Other"
+            name = (p.get("name") or "").strip()
+            brand = (p.get("brand") or "Unknown").strip()
+            category = (p.get("category") or "Other").strip()
             price = p.get("price")
-            weight = p.get("weight", "").strip() if p.get("weight") else ""
-
+            weight = (p.get("weight") or "").strip()
             if not name or not price or price <= 0:
                 continue
-
             key = f"{brand}::{name}".lower()
             if key not in product_map:
-                product_map[key] = {
-                    "name": name,
-                    "brand": brand,
-                    "category": category,
-                    "weight": weight,
-                    "dispensaries": {},
-                }
-            product_map[key]["dispensaries"][comp_name] = round(float(price), 2)
+                product_map[key] = {"name":name,"brand":brand,"category":category,"weight":weight,"dispensaries":{}}
+            product_map[key]["dispensaries"][disp_name] = round(float(price), 2)
 
-    # Keep products found at 2+ dispensaries for comparison
     comparable = [v for v in product_map.values() if len(v["dispensaries"]) >= 2]
-    # Also keep all products (even single-store) for complete visibility
     all_products = list(product_map.values())
-
     comparable.sort(key=lambda x: (x["category"], x["name"]))
     all_products.sort(key=lambda x: (x["category"], x["name"]))
+    output = comparable if len(comparable) >= 5 else all_products
 
-    # Collect deals
     all_deals = []
-    for comp_name, data in results.items():
+    for disp_name, data in results.items():
         if data is None:
             continue
         for d in data.get("deals", []):
             if d.get("title"):
-                all_deals.append({
-                    "dispensary": comp_name,
-                    "title": d["title"],
-                    "type": d.get("discount_type", "other"),
-                    "category": d.get("category", "All"),
-                    "expires": None,
-                })
+                all_deals.append({"dispensary":disp_name,"title":d["title"],"type":d.get("discount_type","other"),"category":d.get("category","All"),"expires":None})
 
     return {
         "scraped_at": datetime.now().isoformat(),
-        "products": all_products if len(comparable) < 5 else comparable,
+        "products": output,
         "deals": all_deals,
         "stats": {
-            "total_products": sum(
-                len(d["products"]) for d in results.values() if d
-            ),
+            "total_products": sum(len(d["products"]) for d in results.values() if d),
             "comparable_products": len(comparable),
             "all_products": len(all_products),
-            "dispensaries_scraped": len([k for k, v in results.items() if v]),
-            "dispensaries_failed": len([k for k, v in results.items() if v is None]),
+            "dispensaries_scraped": len([k for k,v in results.items() if v]),
+            "dispensaries_failed": len([k for k,v in results.items() if v is None]),
             "total_deals": len(all_deals),
         },
     }
@@ -217,55 +236,42 @@ def build_dashboard_data(results):
 
 def main():
     if not API_KEY:
-        print("ERROR: FIRECRAWL_API_KEY environment variable not set.")
-        print("Set it as a GitHub secret or export it locally.")
+        print("ERROR: FIRECRAWL_API_KEY not set.")
         sys.exit(1)
 
     print(f"\n{'='*60}")
-    print(f"  🌿 AFFINITY SCRAPER (Firecrawl)")
-    print(f"  📅 {datetime.now().strftime('%Y-%m-%d %H:%M')}")
+    print(f"  AFFINITY SCRAPER (Firecrawl)")
+    print(f"  {datetime.now().strftime('%Y-%m-%d %H:%M')}")
     all_stores = AFFINITY_STORES + COMPETITORS
-    print(f"  📍 {len(COMPETITORS)} competitors + {len(AFFINITY_STORES)} Affinity stores")
+    print(f"  {len(COMPETITORS)} competitors + {len(AFFINITY_STORES)} Affinity stores")
     print(f"{'='*60}\n")
 
     results = {}
-
-    for comp in all_stores:
-        data = scrape_dispensary(comp["name"], comp["url"])
-        results[comp["name"]] = data
-        # Respect rate limits — 3 second pause between requests
+    for store in all_stores:
+        data = scrape_dispensary(store["name"], store["url"])
+        results[store["name"]] = data
         time.sleep(3)
 
-    # Build dashboard data
     dashboard = build_dashboard_data(results)
 
     print(f"\n{'='*60}")
-    print(f"  📦 Products scraped: {dashboard['stats']['total_products']}")
-    print(f"  📊 Comparable (2+ stores): {dashboard['stats']['comparable_products']}")
-    print(f"  🏪 Dispensaries with data: {dashboard['stats']['dispensaries_scraped']}")
-    print(f"  ❌ Dispensaries failed: {dashboard['stats']['dispensaries_failed']}")
-    print(f"  🏷  Deals found: {dashboard['stats']['total_deals']}")
+    print(f"  Products: {dashboard['stats']['total_products']}")
+    print(f"  Comparable: {dashboard['stats']['comparable_products']}")
+    print(f"  Success: {dashboard['stats']['dispensaries_scraped']}")
+    print(f"  Failed: {dashboard['stats']['dispensaries_failed']}")
+    print(f"  Deals: {dashboard['stats']['total_deals']}")
     print(f"{'='*60}\n")
 
-    # Save to data/ directory
     os.makedirs("data", exist_ok=True)
     ts = datetime.now().strftime("%Y%m%d_%H%M%S")
-    raw_path = f"data/raw_{ts}.json"
-    with open(raw_path, "w") as f:
+    with open(f"data/raw_{ts}.json", "w") as f:
         json.dump(results, f, indent=2, default=str)
-    print(f"  ✓ Raw data → {raw_path}")
-
-    # Save dashboard JSON to parent directory (for GitHub Pages)
     dash_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "dashboard_data.json")
     with open(dash_path, "w") as f:
         json.dump(dashboard, f, indent=2, default=str)
-    print(f"  ✓ Dashboard data → dashboard_data.json")
-
-    # Also save a local copy
     with open(f"data/dashboard_{ts}.json", "w") as f:
         json.dump(dashboard, f, indent=2, default=str)
-
-    print(f"\n  ✅ DONE\n")
+    print(f"  DONE\n")
 
 
 if __name__ == "__main__":
