@@ -34,7 +34,7 @@ jobs:
         run: |
           git config user.name "Affinity Intel Bot"
           git config user.email "bot@affinity.com"
-          git add dashboard_data.json
-          git pull --rebase
+          git add -A
           git diff --cached --quiet || git commit -m "Auto-update $(date '+%Y-%m-%d %H:%M')"
+          git pull --rebase || true
           git push
