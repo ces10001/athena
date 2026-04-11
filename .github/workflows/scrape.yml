@@ -28,7 +28,7 @@ jobs:
         env:
           APIFY_TOKEN: ${{ secrets.APIFY_TOKEN }}
         run: python scrape.py
-        timeout-minutes: 30
+        timeout-minutes: 35
 
       - name: Commit updated data
         run: |
