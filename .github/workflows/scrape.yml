@@ -2,7 +2,7 @@ name: Scrape Competitors
 
 on:
   schedule:
-    - cron: '0 12,22 * * *'
+    - cron: '0 14 * * *'
   workflow_dispatch:
 
 jobs:
@@ -23,12 +23,12 @@ jobs:
       - name: Install dependencies
         run: pip install requests
 
-      - name: Run Apify scraper
+      - name: Run scraper
         working-directory: ./scraper
         env:
-          APIFY_TOKEN: ${{ secrets.APIFY_TOKEN }}
+          HOODIE_REFRESH_TOKEN: ${{ secrets.HOODIE_REFRESH_TOKEN }}
         run: python scrape.py
-        timeout-minutes: 35
+        timeout-minutes: 20
 
       - name: Commit updated data
         run: |
