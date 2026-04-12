@@ -51,34 +51,26 @@ CT_CITIES = [
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 # AUTH — Self-sustaining token chain
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-def get_refresh_token():
+def get_token_sources():
     """
-    Token priority:
+    Return all available refresh tokens to try, in priority order:
       1. data/new_refresh_token.txt (rotated from previous run)
       2. HOODIE_REFRESH_TOKEN env var (GitHub secret, initial seed)
-    After first successful run, the file token sustains itself.
     """
+    sources = []
     if os.path.exists(TOKEN_FILE):
         with open(TOKEN_FILE, "r") as f:
             tok = f.read().strip()
         if tok and len(tok) > 20:
-            print("  Token source: committed file (self-sustaining)")
-            return tok
+            sources.append(("committed file", tok))
     env = os.environ.get("HOODIE_REFRESH_TOKEN", "").strip()
     if env:
-        print("  Token source: HOODIE_REFRESH_TOKEN secret")
-        return env
-    return ""
+        sources.append(("GitHub secret", env))
+    return sources
 
 
-def authenticate():
-    """Auth0 refresh → id_token. Saves rotated refresh token for next run."""
-    token_in = get_refresh_token()
-    if not token_in:
-        print("  FATAL: No refresh token in file or env")
-        sys.exit(1)
-
-    print("  Authenticating with Auth0...")
+def try_auth(token_in):
+    """Attempt Auth0 authentication. Returns (id_token, new_refresh_token) or (None, None)."""
     try:
         r = requests.post(
             f"https://{AUTH0_DOMAIN}/oauth/token",
@@ -90,13 +82,39 @@ def authenticate():
             timeout=30,
         )
     except requests.RequestException as e:
-        print(f"  FATAL: Network error during auth: {e}")
-        sys.exit(1)
+        print(f"    Network error: {e}")
+        return None, None
 
     if r.status_code != 200:
-        print(f"  FATAL: Auth failed (HTTP {r.status_code})")
-        print(f"  Response: {r.text[:300]}")
+        print(f"    Failed (HTTP {r.status_code}): {r.text[:120]}")
+        return None, None
+
+    body = r.json()
+    return body.get("id_token"), body.get("refresh_token", "")
+
+
+def authenticate():
+    """Try all available tokens with automatic fallback."""
+    sources = get_token_sources()
+    if not sources:
+        print("  FATAL: No refresh token in file or env")
+        sys.exit(1)
+
+    id_token = None
+    new_rt = None
+
+    for label, tok in sources:
+        print(f"  Trying {label}...")
+        id_token, new_rt = try_auth(tok)
+        if id_token:
+            print(f"  Auth OK via {label} (id_token: {len(id_token)} chars)")
+            break
+        else:
+            print(f"  {label} token expired, trying next...")
+
+    if not id_token:
         print()
+        print("  FATAL: All tokens expired.")
         print("  To fix: get a fresh token from Hoodie Analytics")
         print("  DevTools Console → paste:")
         print("  JSON.parse(localStorage.getItem(")
@@ -105,21 +123,12 @@ def authenticate():
         print("  Then update HOODIE_REFRESH_TOKEN in GitHub Secrets")
         sys.exit(1)
 
-    body = r.json()
-    id_token = body.get("id_token")
-    if not id_token:
-        print(f"  FATAL: No id_token in response. Keys: {list(body.keys())}")
-        sys.exit(1)
-
     # Save rotated refresh token for next run
-    new_rt = body.get("refresh_token", "")
-    if new_rt and new_rt != token_in:
+    if new_rt:
         os.makedirs(DATA_DIR, exist_ok=True)
         with open(TOKEN_FILE, "w") as f:
             f.write(new_rt)
         print("  Refresh token rotated → saved for next run")
-
-    print(f"  Auth OK (id_token: {len(id_token)} chars)")
 
     # Establish Hoodie session
     try:
