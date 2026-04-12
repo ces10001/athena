@@ -289,7 +289,7 @@ function MarketTab({data}){
       const menuType=(name.match(/\(([^)]+)\)$/)||[])[1];
       if(menuType)byBase[base].menus.push(menuType);
     });
-    return Object.entries(byBase).map(([name,info])=>({name:name+(info.menus.length>1?" ("+info.menus.join("/")+")"):""),city:info.city,daily:info.daily,products:info.products,isYou:info.isYou})).filter(d=>d.daily>0).sort((a,b)=>sort==="sales"?b.daily-a.daily:b.products-a.products);
+    return Object.entries(byBase).map(function(e){var nm=e[0],info=e[1];var label=info.menus.length>1?nm+" ("+info.menus.join("/")+")":nm;return{name:label,city:info.city,daily:info.daily,products:info.products,isYou:info.isYou}}).filter(d=>d.daily>0).sort((a,b)=>sort==="sales"?b.daily-a.daily:b.products-a.products);
   },[disps,sort]);
   const maxD=list.length?Math.max(...list.map(d=>d.daily)):1;
   return<div className="pnl"><div className="row" style={{justifyContent:'space-between',marginBottom:12}}><span className="pnl-t" style={{margin:0}}>Dispensary daily revenue ranking</span>
