@@ -161,6 +161,45 @@ function IntelTab({data,q,setQ,sel,setSel,cat,setCat,comp,setComp,radius,setRadi
     </div>}
     {showNew&&newProds.length>0&&<div className="tw" style={{marginBottom:12}}><div className="ts" style={{maxHeight:200}}><table><thead><tr><th>New product</th><th>Brand</th><th>Category</th><th>Dispensaries</th></tr></thead>
       <tbody>{newProds.slice(0,50).map((p,i)=><tr key={i}><td className="pn">{p.name}</td><td className="dm">{p.brand}</td><td className="dm">{p.category}</td><td className="dm">{(p.dispensaries||[]).map(cleanD).join(", ")}</td></tr>)}</tbody></table></div></div>}
+    <div className="pnl" style={{marginBottom:12}}>
+      <div className="pnl-t">Your price position</div>
+      <div className="pnl-d">How your prices compare across all comparable products.</div>
+      {(()=>{
+        const prods=data.products||[];const disps=getDisps(prods);const affC=disps.filter(isAff);
+        let cheaper=0,same=0,pricier=0;const byCat={};
+        prods.forEach(p=>{
+          const yp=getYP(p,affC);if(!yp)return;
+          Object.entries(p.dispensaries||{}).forEach(([d,cp])=>{
+            if(isAff(d)||!cp)return;
+            const cat=p.category||"Other";if(!byCat[cat])byCat[cat]={c:0,s:0,p:0};
+            if(cp>yp){cheaper++;byCat[cat].c++}else if(cp<yp){pricier++;byCat[cat].p++}else{same++;byCat[cat].s++}
+          });
+        });
+        const total=cheaper+same+pricier;if(!total)return<div className="empty"><h3>No comparable data</h3></div>;
+        const cpct=Math.round(cheaper/total*100),spct=Math.round(same/total*100),ppct=Math.round(pricier/total*100);
+        return<div>
+          <div style={{display:'flex',gap:16,marginBottom:12,flexWrap:'wrap'}}>
+            <div style={{flex:1,minWidth:100,textAlign:'center',padding:10,background:'rgba(0,230,118,.06)',borderRadius:8,border:'1px solid rgba(0,230,118,.15)'}}>
+              <div style={{fontFamily:'var(--m)',fontSize:28,fontWeight:700,color:'var(--gn)'}}>{cpct}%</div>
+              <div style={{fontSize:11,color:'var(--tx2)'}}>You're cheaper</div>
+              <div style={{fontSize:10,color:'var(--tx3)',marginTop:2}}>{cheaper.toLocaleString()} comparisons</div>
+            </div>
+            <div style={{flex:1,minWidth:100,textAlign:'center',padding:10,background:'rgba(0,212,230,.06)',borderRadius:8,border:'1px solid rgba(0,212,230,.15)'}}>
+              <div style={{fontFamily:'var(--m)',fontSize:28,fontWeight:700,color:'var(--cy)'}}>{spct}%</div>
+              <div style={{fontSize:11,color:'var(--tx2)'}}>Same price</div>
+              <div style={{fontSize:10,color:'var(--tx3)',marginTop:2}}>{same.toLocaleString()} comparisons</div>
+            </div>
+            <div style={{flex:1,minWidth:100,textAlign:'center',padding:10,background:'rgba(255,61,87,.06)',borderRadius:8,border:'1px solid rgba(255,61,87,.15)'}}>
+              <div style={{fontFamily:'var(--m)',fontSize:28,fontWeight:700,color:'var(--rd)'}}>{ppct}%</div>
+              <div style={{fontSize:11,color:'var(--tx2)'}}>They're cheaper</div>
+              <div style={{fontSize:10,color:'var(--tx3)',marginTop:2}}>{pricier.toLocaleString()} comparisons</div>
+            </div>
+          </div>
+          <div style={{fontSize:11,color:'var(--tx2)',marginBottom:6}}>By category:</div>
+          <div style={{display:'flex',gap:6,flexWrap:'wrap'}}>{Object.entries(byCat).sort((a,b)=>(b[1].c+b[1].s+b[1].p)-(a[1].c+a[1].s+a[1].p)).map(([cat,v])=>{const t=v.c+v.s+v.p;const wp=Math.round(v.c/t*100);return<div key={cat} style={{fontSize:11,padding:'4px 10px',background:'var(--bg2)',borderRadius:5,border:'1px solid var(--bd)'}}><span style={{color:'var(--tx)'}}>{cat}</span> <span style={{fontFamily:'var(--m)',color:wp>=50?'var(--gn)':'var(--rd)',marginLeft:4}}>{wp}% winning</span></div>})}</div>
+        </div>
+      })()}
+    </div>
     <div className="glow"/>
     <div className="g2"><MapPanel data={data} sel={sel} radius={radius} setRadius={setRadius}/><DispPanel data={data} sel={sel} setSel={setSel}/></div>
     <div className="pnl"><div className="pnl-t">Search products</div><div className="pnl-d">Find any product by name, brand, or strain across all dispensaries.</div><div className="srch"><span className="srch-ic">{String.fromCharCode(8981)}</span><input type="search" placeholder="Product name, brand, or strain..." value={q} onChange={e=>setQ(e.target.value)}/></div></div>
@@ -249,8 +288,8 @@ function normName(n){
 }
 
 function GapsTab({data}){
-  const prods=data.products||[];const disps=getDisps(prods);const affC=disps.filter(isAff);const compD=disps.filter(d=>!isAff(d));
-  const[gapDisp,setGapDisp]=useState("");
+  const prods=data.products||[];const disps=getDisps(prods);const affC=disps.filter(isAff);
+  const[gapChain,setGapChain]=useState("");
   const gaps=useMemo(()=>{
     const affProducts=new Set();
     prods.forEach(p=>{affC.forEach(a=>{if(p.dispensaries&&p.dispensaries[a]){affProducts.add(normName(p.name))}})});
@@ -265,31 +304,50 @@ function GapsTab({data}){
         byComp[d].push({name:p.name,brand:p.brand,category:p.category,price:p.dispensaries[d]});
       });
     });
-    return Object.entries(byComp).map(([name,items])=>({name,count:items.length,items:items.sort((a,b)=>a.category.localeCompare(b.category)||(a.name||"").localeCompare(b.name||""))})).sort((a,b)=>b.count-a.count);
+    // Group by chain
+    const byChain={};
+    Object.entries(byComp).forEach(([dn,items])=>{
+      const chain=getChain(dn);
+      if(!byChain[chain])byChain[chain]={locations:{},total:0};
+      byChain[chain].locations[dn]={count:items.length,items:items.sort((a,b)=>a.category.localeCompare(b.category))};
+      byChain[chain].total+=items.length;
+    });
+    return Object.entries(byChain).sort((a,b)=>b[1].total-a[1].total).map(([chain,info])=>({chain,total:info.total,locations:Object.entries(info.locations).sort((a,b)=>b[1].count-a[1].count)}));
   },[prods,affC]);
-  const shown=gapDisp?gaps.filter(g=>g.name===gapDisp):gaps.slice(0,5);
-  const totalGaps=gaps.reduce((s,g)=>s+g.count,0);
-  return<div className="pnl"><div className="pnl-t">Products competitors carry that you don't ({totalGaps.toLocaleString()} total gaps)</div>
-    <div className="pnl-d">Products sold by competitors that are not on any Affinity menu. Consider stocking high-sellers.</div>
-    <div style={{marginBottom:12}}><select style={{width:'100%',background:'var(--bg2)',border:'1px solid var(--bd)',color:'var(--tx)',fontFamily:'var(--f)',fontSize:13,padding:'9px 14px',borderRadius:7,outline:'none'}} value={gapDisp} onChange={e=>setGapDisp(e.target.value)}>
-      <option value="">Show top 5 competitors by gap count</option>
-      {gaps.map(g=><option key={g.name} value={g.name}>{cleanD(g.name)} ({g.count} products you don't carry)</option>)}
+  const shown=gapChain?gaps.filter(g=>g.chain===gapChain):gaps;
+  const totalGaps=gaps.reduce((s,g)=>s+g.total,0);
+  const[openLocs,setOpenLocs]=useState(new Set());
+  const doExport=()=>{const rows=[["Chain","Dispensary","Product","Brand","Category","Their Price"]];shown.forEach(g=>{g.locations.forEach(([dn,info])=>{info.items.forEach(p=>{rows.push([g.chain,cleanD(dn),p.name,p.brand,p.category,"$"+p.price.toFixed(2)])})})});const ws=XLSX.utils.aoa_to_sheet(rows);const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,"Product Gaps");ws["!cols"]=[{wch:20},{wch:30},{wch:40},{wch:20},{wch:15},{wch:12}];XLSX.writeFile(wb,"athena_product_gaps.xlsx")};
+  return<div className="pnl">
+    <div className="row" style={{justifyContent:'space-between',marginBottom:10}}>
+      <span className="pnl-t" style={{margin:0}}>Product gaps ({totalGaps.toLocaleString()} products you don't carry)</span>
+      <button className="btn pri" onClick={doExport}>Export Excel</button>
+    </div>
+    <div className="pnl-d">Products sold by competitors that are not on any Affinity menu, grouped by chain. Consider stocking high-sellers.</div>
+    <div style={{marginBottom:12}}><select style={{width:'100%',background:'var(--bg2)',border:'1px solid var(--bd)',color:'var(--tx)',fontFamily:'var(--f)',fontSize:13,padding:'9px 14px',borderRadius:7,outline:'none'}} value={gapChain} onChange={e=>setGapChain(e.target.value)}>
+      <option value="">All chains ({gaps.length})</option>
+      {gaps.map(g=><option key={g.chain} value={g.chain}>{g.chain} ({g.total} gaps)</option>)}
     </select></div>
-    {shown.map(g=><div key={g.name} style={{marginBottom:16}}>
-      <div style={{fontSize:14,fontWeight:600,color:'var(--tx)',marginBottom:8}}>{cleanD(g.name)} <span style={{fontSize:11,color:'var(--tx2)',fontWeight:400}}>- {g.count} products you're missing</span></div>
-      <div className="tw"><div className="ts" style={{maxHeight:300}}><table><thead><tr><th>Product</th><th>Brand</th><th>Category</th><th>Their price</th></tr></thead>
-        <tbody>{g.items.slice(0,100).map((p,i)=><tr key={i}><td className="pn">{p.name}</td><td className="dm">{p.brand}</td><td className="dm">{p.category}</td><td className="pr">${p.price.toFixed(2)}</td></tr>)}</tbody>
-      </table></div></div>
+    {shown.map(g=><div key={g.chain} style={{marginBottom:16}}>
+      <div className="dsel-grp">{g.chain} ({g.total} products you're missing)</div>
+      {g.locations.map(([dn,info])=>{const isO=openLocs.has(dn);
+        return<div key={dn} style={{borderBottom:'1px solid rgba(0,215,235,.06)'}}>
+          <div onClick={()=>setOpenLocs(p=>{const n=new Set(p);n.has(dn)?n.delete(dn):n.add(dn);return n})} className="dsel-item" style={{padding:'8px 12px'}}>
+            <div className="dsel-left"><span style={{color:'var(--tx3)',fontSize:10,transform:isO?'rotate(90deg)':'rotate(0)',display:'inline-block',transition:'transform .2s'}}>{String.fromCharCode(9654)}</span><span className="dsel-name">{cleanD(dn)}</span></div>
+            <span className="dsel-count">{info.count} gaps</span></div>
+          {isO&&<div style={{padding:'4px 12px 8px 28px'}}><table style={{fontSize:12}}><thead><tr><th>Product</th><th>Brand</th><th>Category</th><th>Price</th></tr></thead>
+            <tbody>{info.items.slice(0,80).map((p,i)=><tr key={i}><td className="pn">{p.name}</td><td className="dm">{p.brand}</td><td className="dm">{p.category}</td><td className="pr">${p.price.toFixed(2)}</td></tr>)}</tbody></table></div>}
+        </div>})}
     </div>)}
   </div>;
 }
 
 function VelocityTab({data}){
-  const[vCat,setVCat]=useState("All");const vel=data.velocity||[];
-  const filtered=useMemo(()=>{let v=vel;if(vCat!=="All")v=v.filter(x=>x.category===vCat);return v.slice(0,50)},[vel,vCat]);
+  const[vCat,setVCat]=useState("All");const[vMine,setVMine]=useState(false);const vel=data.velocity||[];
+  const filtered=useMemo(()=>{let v=vel;if(vMine)v=v.filter(x=>isAff(x.dispensary));if(vCat!=="All")v=v.filter(x=>x.category===vCat);return v.slice(0,50)},[vel,vCat,vMine]);
   const cats=useMemo(()=>{const s=new Set();vel.forEach(v=>s.add(v.category));return["All",...[...s].sort()]},[vel]);
   const maxSale=filtered.length?Math.max(...filtered.map(v=>v.sales_7d)):1;
-  return<div className="pnl"><div className="row" style={{justifyContent:'space-between',marginBottom:12}}><span className="pnl-t" style={{margin:0}}>Top 50 products by 7-day sales</span></div>
+  return<div className="pnl"><div className="row" style={{justifyContent:'space-between',marginBottom:12}}><span className="pnl-t" style={{margin:0}}>Top 50 products by 7-day sales</span><button className="btn pri" onClick={()=>{const hdr=["Product","Brand","Dispensary","Price","7d Revenue","Units"];const d=filtered.map(v=>[v.name,v.brand,cleanD(v.dispensary),"$"+v.price.toFixed(2),"$"+Math.round(v.sales_7d),""+Math.round(v.units_7d)]);const ws=XLSX.utils.aoa_to_sheet([hdr,...d]);const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,"Velocity");XLSX.writeFile(wb,"athena_velocity.xlsx")}}>Export Excel</button><label style={{fontSize:11,color:vMine?'var(--cy)':'var(--tx2)',cursor:'pointer',display:'flex',alignItems:'center',gap:4,marginLeft:6}}><input type="checkbox" checked={vMine} onChange={e=>setVMine(e.target.checked)}/>Your products only</label></div>
     <div className="pnl-d">Highest revenue products in the last 7 days across all dispensaries. See what's moving fastest.</div>
     <div className="cats">{cats.map(c=><div key={c} className={"ct "+(vCat===c?"on":"")} onClick={()=>setVCat(c)}>{c}</div>)}</div>
     {!filtered.length?<div className="empty"><h3>No velocity data</h3><p style={{fontSize:11}}>Run the updated scraper to populate sales data.</p></div>:
@@ -332,7 +390,7 @@ function StockTab({data}){
   const alerts=data.stock_alerts||[];const[filter,setFilter]=useState("all");
   const filtered=useMemo(()=>filter==="all"?alerts:alerts.filter(a=>a.alert===filter),[alerts,filter]);
   const yourA=filtered.filter(a=>isAff(a.dispensary)).length;const compA=filtered.length-yourA;
-  return<div className="pnl"><div className="row" style={{justifyContent:'space-between',marginBottom:12}}><span className="pnl-t" style={{margin:0}}>Stock alerts ({filtered.length})</span>
+  return<div className="pnl"><div className="row" style={{justifyContent:'space-between',marginBottom:12}}><span className="pnl-t" style={{margin:0}}>Stock alerts ({filtered.length})</span><button className="btn pri" style={{marginLeft:8}} onClick={()=>{const hdr=["Product","Brand","Dispensary","Stock Qty","Days to OOS","OOS Last 28d","Alert Level"];const d=filtered.map(a=>[a.name,a.brand,cleanD(a.dispensary),a.stock_qty!==null?a.stock_qty:"",a.days_until_out!==null?a.days_until_out:"",a.oos_last_28||"",a.alert]);const ws=XLSX.utils.aoa_to_sheet([hdr,...d]);const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,"Stock Alerts");XLSX.writeFile(wb,"athena_stock_alerts.xlsx")}}>Export Excel</button>
     <div className="row"><button className={"btn "+(filter==="all"?"pri":"")} onClick={()=>setFilter("all")}>All</button><button className={"btn "+(filter==="critical"?"pri":"")} onClick={()=>setFilter("critical")}>Critical</button><button className={"btn "+(filter==="warning"?"pri":"")} onClick={()=>setFilter("warning")}>Warning</button></div></div>
     <div className="pnl-d">Products running low or predicted to sell out soon. Competitor stockouts are your opportunity to capture their customers.</div>
     <div className="stats" style={{marginBottom:12}}><div className="st"><div className="st-l">Your alerts</div><div className="st-v" style={{color:'var(--rd)'}}>{yourA}</div></div><div className="st"><div className="st-l">Competitor alerts</div><div className="st-v am">{compA}</div></div><div className="st"><div className="st-l">Competitor stockouts (opportunity)</div><div className="st-v gn">{alerts.filter(a=>!isAff(a.dispensary)&&a.alert==="critical").length}</div></div></div>
