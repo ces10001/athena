@@ -18,20 +18,20 @@
 ::selection{background:var(--cy);color:#000}::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:var(--bg2)}::-webkit-scrollbar-thumb{background:var(--tx3);border-radius:3px}
 .app{max-width:1520px;margin:0 auto;padding:14px 22px}
 .hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;flex-wrap:wrap;gap:12px}
-.logo{display:flex;align-items:center;gap:14px}.logo img{width:46px;height:46px;object-fit:contain;filter:drop-shadow(0 0 10px rgba(0,240,255,.5))}
+.logo{display:flex;align-items:center;gap:14px}.logo img{width:46px;height:46px;object-fit:contain;animation:helmglow 3s ease-in-out infinite}@keyframes helmglow{0%,100%{filter:drop-shadow(0 0 6px rgba(0,240,255,.2))}50%{filter:drop-shadow(0 0 18px rgba(0,240,255,.7)) drop-shadow(0 0 30px rgba(0,240,255,.3))}}
 .lt{display:flex;flex-direction:column}.lt h1{font-size:28px;font-weight:800;letter-spacing:4px;color:var(--cy2);line-height:1;text-shadow:0 0 20px rgba(0,240,255,.3)}.lt span{font-size:10px;letter-spacing:2px;color:var(--tx2);font-family:var(--m);margin-top:2px}
 .meta{font-family:var(--m);font-size:10px;color:var(--tx2);text-align:right;line-height:1.7}
 .glow{height:1px;background:linear-gradient(90deg,transparent,var(--cy),transparent);margin:10px 0;opacity:.25}
 .tabs{display:flex;gap:2px;margin-bottom:14px;background:var(--sf);border-radius:8px;padding:3px;border:1px solid var(--bd);overflow-x:auto}
-.tab{padding:10px 18px;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;color:var(--tx2);transition:all .15s;white-space:nowrap}
+.tab{padding:11px 22px;border-radius:6px;font-size:15px;font-weight:600;cursor:pointer;color:var(--tx2);transition:all .15s;white-space:nowrap}
 .tab:hover{color:var(--tx)}.tab.on{background:rgba(0,212,230,.08);color:var(--cy)}
-.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:8px;margin-bottom:14px}
-.st{background:var(--sf);border:1px solid var(--bd);border-radius:8px;padding:10px 12px}
-.st-l{font-family:var(--m);font-size:8px;text-transform:uppercase;letter-spacing:1.2px;color:var(--tx2);margin-bottom:3px}
-.st-v{font-family:var(--m);font-size:20px;font-weight:600;color:var(--cy)}.st-v.gn{color:var(--gn)}.st-v.am{color:var(--am)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin-bottom:14px}
+.st{background:var(--sf);border:1px solid var(--bd);border-radius:8px;padding:12px 14px}
+.st-l{font-family:var(--m);font-size:10px;text-transform:uppercase;letter-spacing:1.2px;color:var(--tx2);margin-bottom:3px}
+.st-v{font-family:var(--m);font-size:26px;font-weight:600;color:var(--cy)}.st-v.gn{color:var(--gn)}.st-v.am{color:var(--am)}
 .pnl{background:var(--sf);border:1px solid var(--bd);border-radius:10px;padding:14px 16px;margin-bottom:12px}
-.pnl-t{font-family:var(--m);font-size:10px;text-transform:uppercase;letter-spacing:1.2px;color:var(--tx2);margin-bottom:10px}
-.pnl-d{font-size:11px;color:var(--tx3);margin-bottom:10px;line-height:1.4}
+.pnl-t{font-family:var(--m);font-size:13px;text-transform:uppercase;letter-spacing:1.2px;color:var(--tx2);margin-bottom:10px}
+.pnl-d{font-size:13px;color:var(--tx2);margin-bottom:10px;line-height:1.4}
 .map-w{height:320px;border-radius:8px;overflow:hidden;border:1px solid var(--bd)}
 .leaflet-container{background:var(--bg2)!important}
 .leaflet-tile{filter:brightness(.75) saturate(.35) hue-rotate(160deg) contrast(1.15)!important}
@@ -119,11 +119,12 @@ function App(){
       if(d.stats&&d.stats.dispensary_counts){var nc={};Object.entries(d.stats.dispensary_counts).forEach(function(e){var mk=mergeD(e[0]);nc[mk]=(nc[mk]||0)+e[1]});d.stats.dispensary_counts=nc}
       // Count unique locations (Med+Rec = 1 dispensary)
       if(d.dispensaries){var bases=new Set();Object.keys(d.dispensaries).forEach(function(k){bases.add(getBase(k))});d.stats.unique_locations=bases.size}
-      // Filter out accessories globally
-      if(d.products)d.products=d.products.filter(function(p){return(p.category||"").toLowerCase()!=="accessories"});
-      if(d.deals)d.deals=d.deals.filter(function(x){return(x.category||"").toLowerCase()!=="accessories"});
-      if(d.velocity)d.velocity=d.velocity.filter(function(x){return(x.category||"").toLowerCase()!=="accessories"});
-      if(d.stock_alerts)d.stock_alerts=d.stock_alerts.filter(function(x){return(x.category||"").toLowerCase()!=="accessories"});
+      // Filter out accessories and hardware brands globally
+      var isAccessory=function(x){return(x.category||"").toLowerCase()==="accessories"||(x.brand||"").toUpperCase()==="PULSAR"};
+      if(d.products)d.products=d.products.filter(function(p){return!isAccessory(p)});
+      if(d.deals)d.deals=d.deals.filter(function(x){return!isAccessory(x)});
+      if(d.velocity)d.velocity=d.velocity.filter(function(x){return!isAccessory(x)});
+      if(d.stock_alerts)d.stock_alerts=d.stock_alerts.filter(function(x){return!isAccessory(x)});
       setData(d);var all=getDisps(d.products||[]);setSel(new Set(all.filter(isAff).concat(all.filter(function(x){return!isAff(x)}).slice(0,6))));
     }).catch(function(e){setErr(e.message)});
   },[]);
@@ -153,7 +154,7 @@ function Hdr({d}){
 function IntelTab({data,q,setQ,sel,setSel,cat,setCat,comp,setComp,radius,setRadius}){
   const newProds=data.new_products||[];
   const[showNew,setShowNew]=useState(false);
-  return<><div className="stats">{[["Active SKUs",data.stats?.total_active||0,"","Total products tracked across all CT dispensaries"],["Dispensaries",data.stats?.unique_locations||data.stats?.dispensary_count||0,"","Unique dispensary locations being monitored"],["Comparable",data.stats?.comparable||0,"","Products found at 2+ dispensaries for price comparison"],["Deals",data.stats?.deals||0,"am","Active promotions and discounts across all dispensaries"],["SKU matched",data.stats?.match_by_sku||0,"gn","Products matched across stores by exact SKU ID"]].map(([l,v,c,desc])=><div key={l} className="st"><div className="st-l">{l}</div><div className={"st-v "+(c||"")}>{(v||0).toLocaleString()}</div><div style={{fontSize:9,color:'var(--tx3)',marginTop:3,lineHeight:1.3}}>{desc}</div></div>)}</div>
+  return<><div className="stats">{[["Active SKUs",data.stats?.total_active||0,"","Total products tracked across all CT dispensaries"],["Dispensaries",data.stats?.unique_locations||data.stats?.dispensary_count||0,"","Unique dispensary locations being monitored"],["Comparable",data.stats?.comparable||0,"","Products found at 2+ dispensaries for price comparison"],["Deals",data.stats?.deals||0,"am","Active promotions and discounts across all dispensaries"],["NDC Matched",data.stats?.match_by_sku||0,"gn","Same products identified across stores by NDC for accurate price comparison"]].map(([l,v,c,desc])=><div key={l} className="st"><div className="st-l">{l}</div><div className={"st-v "+(c||"")}>{(v||0).toLocaleString()}</div><div style={{fontSize:11,color:'var(--tx2)',marginTop:4,lineHeight:1.3}}>{desc}</div></div>)}</div>
     {newProds.length>0&&<div style={{background:'rgba(0,230,118,.06)',border:'1px solid rgba(0,230,118,.2)',borderRadius:8,padding:'10px 14px',marginBottom:12,display:'flex',justifyContent:'space-between',alignItems:'center',cursor:'pointer'}} onClick={()=>setShowNew(!showNew)}>
       <div><span style={{color:'var(--gn)',fontWeight:600,fontSize:13}}>{newProds.length} new products</span><span style={{color:'var(--tx2)',fontSize:12,marginLeft:8}}>appeared since yesterday</span></div>
       <span style={{color:'var(--tx3)',fontSize:10}}>{showNew?"Hide":"Show"}</span>
