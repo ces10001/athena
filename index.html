@@ -30,7 +30,7 @@ body{font-family:var(--f);background:var(--bg);color:var(--tx);min-height:100vh}
 
 /* Tabs */
 .tabs{display:flex;gap:2px;margin-bottom:14px;background:var(--sf);border-radius:8px;padding:3px;border:1px solid var(--bd)}
-.tab{padding:8px 18px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;color:var(--tx2);transition:all .15s;letter-spacing:.3px}
+.tab{padding:10px 22px;border-radius:6px;font-size:14px;font-weight:600;cursor:pointer;color:var(--tx2);transition:all .15s;letter-spacing:.3px}
 .tab:hover{color:var(--tx)}
 .tab.on{background:rgba(0,212,230,.08);color:var(--cy);box-shadow:0 0 12px rgba(0,240,255,.08)}
 
@@ -76,7 +76,7 @@ body{font-family:var(--f);background:var(--bg);color:var(--tx);min-height:100vh}
 .btn.pri{background:rgba(0,212,230,.1);border-color:var(--cy);color:var(--cy)}
 
 .cats{display:flex;gap:3px;margin-bottom:10px;flex-wrap:wrap}
-.ct{padding:4px 11px;border-radius:5px;font-size:10px;font-weight:600;cursor:pointer;background:transparent;color:var(--tx2);border:1px solid transparent;transition:all .15s}
+.ct{padding:7px 16px;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;background:transparent;color:var(--tx2);border:1px solid transparent;transition:all .15s}
 .ct:hover{color:var(--tx);background:var(--sf)}
 .ct.on{background:var(--cydim);color:var(--cy);border-color:rgba(0,215,235,.2)}
 
@@ -84,16 +84,16 @@ body{font-family:var(--f);background:var(--bg);color:var(--tx);min-height:100vh}
 .tw{background:var(--sf);border:1px solid var(--bd);border-radius:10px;overflow:hidden}
 .ts{overflow-x:auto;max-height:580px;overflow-y:auto}
 .inf{padding:9px 14px;font-family:var(--m);font-size:10px;color:var(--tx2);border-bottom:1px solid var(--bd);display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px;align-items:center}
-table{width:100%;border-collapse:collapse;font-size:11px}
-thead th{background:var(--bg2);padding:8px 10px;text-align:left;font-family:var(--m);font-size:9px;text-transform:uppercase;letter-spacing:.7px;color:var(--tx2);font-weight:600;border-bottom:1px solid var(--bd);position:sticky;top:0;z-index:2;white-space:nowrap;cursor:pointer}
+table{width:100%;border-collapse:collapse;font-size:13px}
+thead th{background:var(--bg2);padding:9px 10px;text-align:left;font-family:var(--m);font-size:10px;text-transform:uppercase;letter-spacing:.7px;color:var(--tx2);font-weight:600;border-bottom:1px solid var(--bd);position:sticky;top:0;z-index:2;white-space:nowrap;cursor:pointer}
 thead th:hover{color:var(--tx)}
 thead th.yc{color:var(--cy);background:rgba(0,240,255,.03)}
 tbody tr{border-bottom:1px solid rgba(0,215,235,.04);transition:background .1s}
 tbody tr:hover{background:rgba(0,240,255,.025)}
-td{padding:6px 10px;white-space:nowrap}
-td.pn{font-weight:500;color:var(--tx);max-width:220px;white-space:normal;word-break:break-word;font-size:11px}
-td.dm{color:var(--tx2);font-size:10px}
-td.pr{font-family:var(--m);font-weight:600;font-size:11px}
+td{padding:7px 10px;white-space:nowrap}
+td.pn{font-weight:500;color:var(--tx);max-width:240px;white-space:normal;word-break:break-word;font-size:13px}
+td.dm{color:var(--tx2);font-size:12px}
+td.pr{font-family:var(--m);font-weight:600;font-size:13px}
 td.pr.yp{color:var(--cy);background:rgba(0,240,255,.03)}
 td.pr.hi{color:var(--gn)}
 td.pr.lo{color:var(--rd)}
@@ -149,15 +149,9 @@ function hashStr(s){let h=0;for(let i=0;i<s.length;i++){h=((h<<5)-h)+s.charCodeA
 function isAff(n){return n.toLowerCase().includes("affinity")}
 function cleanDisp(n){return n.replace(/Dispensary\s*-?\s*/g,"").replace(/ - /g," ")}
 
-// Merge Dutchie Rec with regular Affinity menu
+// Merge Dutchie Rec/Med into regular Rec/Med for all dispensaries
 function mergeDispName(n){
-  if(n.includes("(Dutchie Rec)")&&n.toLowerCase().includes("affinity")){
-    return n.replace("(Dutchie Rec)","(Rec)");
-  }
-  if(n.includes("(Dutchie Med)")&&n.toLowerCase().includes("affinity")){
-    return n.replace("(Dutchie Med)","(Med)");
-  }
-  return n;
+  return n.replace("(Dutchie Rec)","(Rec)").replace("(Dutchie Med)","(Med)");
 }
 
 function getDisps(prods){
@@ -283,13 +277,38 @@ function MapPanel({data,sel}){
   return<div className="pnl"><div className="pnl-t">Connecticut dispensary map</div><div className="map-w" ref={ref}></div></div>;
 }
 
+function getBaseDispName(n){
+  return n.replace(/\s*\((?:Med|Rec|Dutchie Rec|Dutchie Med)\)\s*$/,'').replace(/Dispensary\s*-?\s*/g,'').replace(/ - /g,' ').trim();
+}
+
 function DispPanel({data,sel,setSel}){
   const prods=data.products||[];
   const disps=useMemo(()=>getDisps(prods),[prods]);
   const counts=useMemo(()=>{const c={};disps.forEach(d=>c[d]=0);prods.forEach(p=>Object.keys(p.dispensaries||{}).forEach(d=>c[d]=(c[d]||0)+1));return c},[prods,disps]);
+  const[openGroups,setOpenGroups]=useState(new Set(["Affinity New Haven","Affinity Bridgeport"]));
+
+  // Group by base business name
+  const grouped=useMemo(()=>{
+    const g={};
+    disps.forEach(d=>{
+      const base=getBaseDispName(d);
+      if(!g[base])g[base]={variants:[],isYou:false};
+      g[base].variants.push(d);
+      if(isAff(d))g[base].isYou=true;
+    });
+    return Object.entries(g).sort((a,b)=>{
+      if(a[1].isYou&&!b[1].isYou)return-1;
+      if(!a[1].isYou&&b[1].isYou)return 1;
+      return a[0].localeCompare(b[0]);
+    });
+  },[disps]);
+
   const tog=useCallback(d=>{setSel(prev=>{const n=new Set(prev);n.has(d)?n.delete(d):n.add(d);return n})},[]);
+  const togGroup=useCallback(base=>{setOpenGroups(prev=>{const n=new Set(prev);n.has(base)?n.delete(base):n.add(base);return n})},[]);
+  const togAllInGroup=useCallback((variants,on)=>{setSel(prev=>{const n=new Set(prev);variants.forEach(v=>on?n.add(v):n.delete(v));return n})},[]);
+
   return<div className="pnl">
-    <div className="row" style={{justifyContent:'space-between',marginBottom:8}}>
+    <div className="row" style={{justifyContent:'space-between',marginBottom:10}}>
       <span className="pnl-t" style={{margin:0}}>Compare dispensaries</span>
       <div className="row">
         <button className="btn" onClick={()=>setSel(new Set(disps))}>All</button>
@@ -297,7 +316,40 @@ function DispPanel({data,sel,setSel}){
         <button className="btn" onClick={()=>{const a=disps.filter(isAff);const r=disps.filter(x=>!isAff(x)).slice(0,6);setSel(new Set([...a,...r]))}}>Reset</button>
       </div>
     </div>
-    <div className="chips">{disps.map(d=>{const y=isAff(d),on=sel.has(d);return<div key={d} className={"ch "+(on?"on ":"")+(y?"you":"")} onClick={()=>tog(d)}><span className="ch-d"/>{cleanDisp(d)}<span className="ch-n">{counts[d]}</span></div>})}</div>
+    <div style={{maxHeight:300,overflowY:'auto',display:'flex',flexDirection:'column',gap:3}}>
+      {grouped.map(([base,info])=>{
+        const isOpen=openGroups.has(base);
+        const selectedCount=info.variants.filter(v=>sel.has(v)).length;
+        const totalProducts=info.variants.reduce((s,v)=>(s+(counts[v]||0)),0);
+        const allOn=selectedCount===info.variants.length;
+        return<div key={base} style={{background:'var(--bg2)',border:'1px solid '+(info.isYou?'rgba(0,240,255,.2)':'var(--bd)'),borderRadius:7,overflow:'hidden'}}>
+          <div onClick={()=>togGroup(base)} style={{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'8px 12px',cursor:'pointer',background:isOpen?'rgba(0,212,230,.03)':'transparent'}}>
+            <div style={{display:'flex',alignItems:'center',gap:8}}>
+              <span style={{color:'var(--tx3)',fontSize:10,transition:'transform .2s',transform:isOpen?'rotate(90deg)':'rotate(0)',display:'inline-block'}}>{"\u25B6"}</span>
+              <span style={{fontSize:13,fontWeight:600,color:info.isYou?'var(--cy2)':'var(--tx)'}}>{info.isYou?"\u2605 ":""}{base}</span>
+            </div>
+            <div style={{display:'flex',alignItems:'center',gap:10}}>
+              {selectedCount>0&&<span className="badge cy">{selectedCount} selected</span>}
+              <span style={{fontFamily:'var(--m)',fontSize:10,color:'var(--tx2)'}}>{info.variants.length} menu{info.variants.length!==1?'s':''} \u2022 {totalProducts.toLocaleString()}</span>
+            </div>
+          </div>
+          {isOpen&&<div style={{borderTop:'1px solid var(--bd)',padding:'8px 12px 10px',display:'flex',flexDirection:'column',gap:5}}>
+            {info.variants.length>1&&<div style={{display:'flex',justifyContent:'flex-end',marginBottom:2}}>
+              <button className="btn" style={{fontSize:8}} onClick={e=>{e.stopPropagation();togAllInGroup(info.variants,!allOn)}}>{allOn?'Deselect all':'Select all'}</button>
+            </div>}
+            {info.variants.map(v=>{
+              const on=sel.has(v);
+              const label=v.match(/\(([^)]+)\)$/)?.[1]||'Menu';
+              return<div key={v} onClick={()=>tog(v)} style={{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'6px 8px',borderRadius:5,cursor:'pointer',background:on?'rgba(0,212,230,.06)':'transparent',border:'1px solid '+(on?'rgba(0,212,230,.2)':'transparent'),transition:'all .15s'}}>
+                <div style={{display:'flex',alignItems:'center',gap:8}}>
+                  <div style={{width:8,height:8,borderRadius:'50%',background:on?'var(--cy)':'var(--tx3)',boxShadow:on?'0 0 5px var(--cy)':'none',transition:'all .15s'}}/>
+                  <span style={{fontSize:13,fontWeight:500,color:on?'var(--cy)':'var(--tx2)'}}>{label}</span>
+                </div>
+                <span style={{fontFamily:'var(--m)',fontSize:11,color:'var(--tx2)'}}>{(counts[v]||0).toLocaleString()} products</span>
+              </div>})}
+          </div>}
+        </div>})}
+    </div>
   </div>;
 }
 
