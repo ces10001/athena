@@ -149,9 +149,21 @@ function hashStr(s){let h=0;for(let i=0;i<s.length;i++){h=((h<<5)-h)+s.charCodeA
 function isAff(n){return n.toLowerCase().includes("affinity")}
 function cleanDisp(n){return n.replace(/Dispensary\s*-?\s*/g,"").replace(/ - /g," ")}
 
-// Merge Dutchie Rec/Med into regular Rec/Med for all dispensaries
+// Merge Dutchie data into Hoodie dispensary columns
+const DUTCHIE_NAME_MAP={
+  "Affinity NH (Dutchie Rec)":"Affinity Dispensary - New Haven (Rec)",
+  "Affinity NH (Dutchie Med)":"Affinity Dispensary - New Haven (Med)",
+  "RISE Orange (Dutchie)":"RISE Dispensary - Orange (Rec)",
+  "RISE Branford (Dutchie)":"RISE Dispensary - Branford (Rec)",
+  "Zen Leaf Waterbury (Dutchie)":"Zen Leaf - Waterbury (Rec)",
+  "Zen Leaf Meriden (Dutchie)":"Zen Leaf - Meriden (Rec)",
+  "Zen Leaf Newington (Dutchie)":"Zen Leaf - Newington (Rec)",
+  "Zen Leaf Naugatuck (Dutchie)":"Zen Leaf - Naugatuck (Rec)",
+  "Fine Fettle Newington (Dutchie)":"Fine Fettle - Newington (Rec)",
+  "Higher Collective BPT (Dutchie)":"Higher Collective - Bridgeport (Rec)",
+};
 function mergeDispName(n){
-  return n.replace("(Dutchie Rec)","(Rec)").replace("(Dutchie Med)","(Med)");
+  return DUTCHIE_NAME_MAP[n]||n.replace("(Dutchie Rec)","(Rec)").replace("(Dutchie Med)","(Med)");
 }
 
 function getDisps(prods){
