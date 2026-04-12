@@ -3,388 +3,283 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Affinity Intel — CT Competitive Pricing</title>
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<title>ATHENA — Affinity Competitive Intel</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
 <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 <style>
-:root {
-  --bg: #000000;
-  --bg2: #060a10;
-  --surface: #0c1219;
-  --surface2: #111b26;
-  --border: rgba(0,210,230,0.10);
-  --border2: rgba(0,210,230,0.20);
-  --text: #c8e6ea;
-  --text2: #4d7a85;
-  --text3: #2a4a55;
-  --cyan: #00d4e6;
-  --cyan2: #00f0ff;
-  --cyan-dim: rgba(0,212,230,0.06);
-  --cyan-glow: rgba(0,212,230,0.15);
-  --green: #00e676;
-  --red: #ff3d57;
-  --amber: #ffab40;
-  --font: 'Outfit', sans-serif;
-  --mono: 'IBM Plex Mono', monospace;
+:root{
+--bg:#000;--bg2:#050a0f;--sf:#0b1118;--sf2:#101a24;
+--bd:rgba(0,215,235,.09);--bd2:rgba(0,215,235,.18);--bd3:rgba(0,215,235,.30);
+--tx:#c0e8ef;--tx2:#3d7585;--tx3:#1e3d48;
+--cy:#00d4e6;--cy2:#00f0ff;--cydim:rgba(0,212,230,.05);--cyglow:rgba(0,240,255,.12);
+--gn:#00e676;--rd:#ff3d57;--am:#ffab40;
+--f:'Outfit',sans-serif;--m:'IBM Plex Mono',monospace;
 }
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--f);background:var(--bg);color:var(--tx);min-height:100vh}
+::selection{background:var(--cy);color:#000}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:var(--bg2)}::-webkit-scrollbar-thumb{background:var(--tx3);border-radius:3px}
+.app{max-width:1520px;margin:0 auto;padding:18px 22px}
 
-* { margin:0; padding:0; box-sizing:border-box; }
+.hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px}
+.logo{display:flex;align-items:center;gap:16px}
+.helmet{width:48px;height:48px;position:relative;display:flex;align-items:center;justify-content:center}
+.helmet svg{width:48px;height:48px;filter:drop-shadow(0 0 8px rgba(0,240,255,.4))}
+.logo-text{display:flex;flex-direction:column}
+.logo-text h1{font-size:28px;font-weight:800;letter-spacing:4px;color:var(--cy2);line-height:1;text-shadow:0 0 20px rgba(0,240,255,.3)}
+.logo-text span{font-size:10px;letter-spacing:2px;color:var(--tx2);font-family:var(--m);margin-top:2px}
+.meta{font-family:var(--m);font-size:10px;color:var(--tx2);text-align:right;line-height:1.7}
 
-body {
-  font-family: var(--font);
-  background: var(--bg);
-  color: var(--text);
-  min-height: 100vh;
-  overflow-x: hidden;
-}
+.glow{height:1px;background:linear-gradient(90deg,transparent,var(--cy),transparent);margin:16px 0;opacity:.25}
 
-::selection { background: var(--cyan); color: var(--bg); }
-::-webkit-scrollbar { width: 6px; }
-::-webkit-scrollbar-track { background: var(--bg2); }
-::-webkit-scrollbar-thumb { background: var(--text3); border-radius: 3px; }
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin-bottom:16px}
+.st{background:var(--sf);border:1px solid var(--bd);border-radius:8px;padding:12px;transition:border-color .2s}
+.st:hover{border-color:var(--bd2)}
+.st-l{font-family:var(--m);font-size:9px;text-transform:uppercase;letter-spacing:1.2px;color:var(--tx2);margin-bottom:4px}
+.st-v{font-family:var(--m);font-size:22px;font-weight:600;color:var(--cy)}
 
-.app { max-width: 1500px; margin: 0 auto; padding: 20px 24px; }
+.pnl{background:var(--sf);border:1px solid var(--bd);border-radius:10px;padding:14px 16px;margin-bottom:12px}
+.pnl-t{font-family:var(--m);font-size:10px;text-transform:uppercase;letter-spacing:1.2px;color:var(--tx2);margin-bottom:10px}
 
-/* Header */
-.hdr { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; flex-wrap: wrap; gap: 12px; }
-.logo { display: flex; align-items: center; gap: 14px; }
-.logo-mark {
-  width: 42px; height: 42px; border-radius: 10px;
-  background: linear-gradient(135deg, var(--cyan), #006070);
-  display: flex; align-items: center; justify-content: center;
-  font-family: var(--mono); font-weight: 700; font-size: 20px; color: var(--bg);
-  box-shadow: 0 0 20px rgba(0,212,230,0.25);
-}
-.logo h1 { font-size: 24px; font-weight: 600; letter-spacing: -0.5px; color: var(--text); }
-.logo h1 b { color: var(--cyan); font-weight: 700; }
-.meta { font-family: var(--mono); font-size: 11px; color: var(--text2); text-align: right; line-height: 1.6; }
+.map-w{height:300px;border-radius:8px;overflow:hidden;border:1px solid var(--bd)}
+.leaflet-container{background:var(--bg2)!important}
+.leaflet-tile{filter:brightness(.3) saturate(.2) hue-rotate(160deg)!important}
+.leaflet-control-zoom a{background:var(--sf)!important;color:var(--cy)!important;border-color:var(--bd)!important}
+.leaflet-popup-content-wrapper{background:var(--sf)!important;color:var(--tx)!important;border:1px solid var(--bd2)!important;border-radius:8px!important;box-shadow:0 0 24px rgba(0,240,255,.12)!important}
+.leaflet-popup-tip{background:var(--sf)!important}
+.leaflet-popup-content{font-family:var(--f)!important;font-size:12px!important;margin:8px 12px!important}
 
-/* Stats */
-.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px,1fr)); gap: 10px; margin-bottom: 20px; }
-.stat {
-  background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 14px;
-  transition: border-color 0.2s;
-}
-.stat:hover { border-color: var(--border2); }
-.stat-l { font-family: var(--mono); font-size: 10px; text-transform: uppercase; letter-spacing: 1.2px; color: var(--text2); margin-bottom: 5px; }
-.stat-v { font-family: var(--mono); font-size: 24px; font-weight: 600; color: var(--cyan); }
+.srch{position:relative}
+.srch input{width:100%;background:var(--bg2);border:1px solid var(--bd);color:var(--tx);font-family:var(--f);font-size:13px;padding:10px 14px 10px 38px;border-radius:7px;outline:none;transition:border-color .2s,box-shadow .2s}
+.srch input:focus{border-color:var(--cy);box-shadow:0 0 12px rgba(0,240,255,.1)}
+.srch input::placeholder{color:var(--tx3)}
+.srch-ic{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--tx3);font-size:15px;pointer-events:none}
 
-/* Panels */
-.panel {
-  background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
-  padding: 16px 18px; margin-bottom: 14px;
-}
-.panel-t { font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: 1.2px; color: var(--text2); margin-bottom: 12px; }
+.chips{display:flex;flex-wrap:wrap;gap:5px;max-height:140px;overflow-y:auto;padding:2px}
+.ch{display:flex;align-items:center;gap:4px;padding:4px 10px;border-radius:100px;font-size:10px;font-weight:500;cursor:pointer;user-select:none;transition:all .15s;border:1px solid var(--bd);background:var(--bg2);color:var(--tx2)}
+.ch:hover{border-color:var(--cy);color:var(--tx)}
+.ch.on{background:var(--cydim);border-color:var(--cy);color:var(--cy)}
+.ch.you{background:rgba(0,240,255,.1);border-color:rgba(0,240,255,.3);color:var(--cy2);font-weight:600}
+.ch-d{width:6px;height:6px;border-radius:50%;background:var(--tx3);flex-shrink:0}
+.ch.on .ch-d,.ch.you .ch-d{background:var(--cy);box-shadow:0 0 5px var(--cy)}
+.ch-n{font-family:var(--m);font-size:8px;opacity:.5;margin-left:1px}
 
-/* Map */
-.map-wrap { height: 320px; border-radius: 10px; overflow: hidden; border: 1px solid var(--border); margin-bottom: 14px; }
-.leaflet-container { background: var(--bg2) !important; }
-.leaflet-tile { filter: brightness(0.35) saturate(0.3) hue-rotate(160deg) !important; }
-.leaflet-control-zoom a { background: var(--surface) !important; color: var(--cyan) !important; border-color: var(--border) !important; }
-.leaflet-popup-content-wrapper { background: var(--surface) !important; color: var(--text) !important; border: 1px solid var(--border2) !important; border-radius: 8px !important; box-shadow: 0 0 30px rgba(0,212,230,0.15) !important; }
-.leaflet-popup-tip { background: var(--surface) !important; }
-.leaflet-popup-content { font-family: var(--font) !important; font-size: 13px !important; margin: 10px 14px !important; }
+.btn{padding:4px 10px;border-radius:5px;font-size:9px;font-weight:600;cursor:pointer;border:1px solid var(--bd);background:var(--bg2);color:var(--tx2);font-family:var(--f);transition:all .15s;text-transform:uppercase;letter-spacing:.4px}
+.btn:hover{border-color:var(--cy);color:var(--cy)}
 
-/* Search */
-.search-wrap { position: relative; }
-.search-wrap input {
-  width: 100%; background: var(--bg2); border: 1px solid var(--border);
-  color: var(--text); font-family: var(--font); font-size: 14px;
-  padding: 11px 14px 11px 40px; border-radius: 8px; outline: none;
-  transition: border-color 0.2s, box-shadow 0.2s;
-}
-.search-wrap input:focus { border-color: var(--cyan); box-shadow: 0 0 12px rgba(0,212,230,0.12); }
-.search-wrap input::placeholder { color: var(--text3); }
-.search-ic { position: absolute; left: 13px; top: 50%; transform: translateY(-50%); color: var(--text3); font-size: 16px; pointer-events: none; }
+.cats{display:flex;gap:3px;margin-bottom:12px;flex-wrap:wrap}
+.ct{padding:5px 12px;border-radius:5px;font-size:10px;font-weight:600;cursor:pointer;background:transparent;color:var(--tx2);border:1px solid transparent;transition:all .15s}
+.ct:hover{color:var(--tx);background:var(--sf)}
+.ct.on{background:var(--cydim);color:var(--cy);border-color:rgba(0,215,235,.2)}
 
-/* Chips */
-.chips { display: flex; flex-wrap: wrap; gap: 6px; max-height: 160px; overflow-y: auto; padding: 2px; }
-.chip {
-  display: flex; align-items: center; gap: 5px;
-  padding: 5px 12px; border-radius: 100px; font-size: 11px; font-weight: 500;
-  cursor: pointer; user-select: none; transition: all 0.15s;
-  border: 1px solid var(--border); background: var(--bg2); color: var(--text2);
-}
-.chip:hover { border-color: var(--cyan); color: var(--text); }
-.chip.on { background: var(--cyan-dim); border-color: var(--cyan); color: var(--cyan); }
-.chip.you { background: rgba(0,212,230,0.12); border-color: rgba(0,212,230,0.35); color: var(--cyan2); font-weight: 600; }
-.chip-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--text3); flex-shrink: 0; }
-.chip.on .chip-dot, .chip.you .chip-dot { background: var(--cyan); box-shadow: 0 0 6px var(--cyan); }
-.chip-n { font-family: var(--mono); font-size: 9px; opacity: 0.6; margin-left: 1px; }
+.tw{background:var(--sf);border:1px solid var(--bd);border-radius:10px;overflow:hidden}
+.ts{overflow-x:auto;max-height:600px;overflow-y:auto}
+.inf{padding:10px 16px;font-family:var(--m);font-size:10px;color:var(--tx2);border-bottom:1px solid var(--bd);display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px}
 
-/* Buttons */
-.btn {
-  padding: 5px 11px; border-radius: 6px; font-size: 10px; font-weight: 600;
-  cursor: pointer; border: 1px solid var(--border); background: var(--bg2);
-  color: var(--text2); font-family: var(--font); transition: all 0.15s;
-  text-transform: uppercase; letter-spacing: 0.5px;
-}
-.btn:hover { border-color: var(--cyan); color: var(--cyan); }
+table{width:100%;border-collapse:collapse;font-size:11px}
+thead th{background:var(--bg2);padding:9px 10px;text-align:left;font-family:var(--m);font-size:9px;text-transform:uppercase;letter-spacing:.7px;color:var(--tx2);font-weight:600;border-bottom:1px solid var(--bd);position:sticky;top:0;z-index:2;white-space:nowrap}
+thead th.yc{color:var(--cy);background:rgba(0,240,255,.03)}
+tbody tr{border-bottom:1px solid rgba(0,215,235,.04);transition:background .1s}
+tbody tr:hover{background:rgba(0,240,255,.025)}
+tbody tr:last-child{border-bottom:none}
+td{padding:7px 10px;white-space:nowrap}
+td.pn{font-weight:500;color:var(--tx);max-width:240px;white-space:normal;word-break:break-word;font-size:11px}
+td.dm{color:var(--tx2);font-size:10px}
+td.pr{font-family:var(--m);font-weight:600;font-size:11px}
+td.pr.yp{color:var(--cy);background:rgba(0,240,255,.03)}
+td.pr.lo{color:var(--gn)}
+td.pr.hi{color:var(--rd)}
+td.pr.na{color:var(--tx3);font-weight:400}
+.df{display:inline-block;font-size:8px;padding:1px 4px;border-radius:3px;margin-left:3px;font-weight:600;font-family:var(--m)}
+.df.dn{background:rgba(0,230,118,.1);color:var(--gn)}
+.df.up{background:rgba(255,61,87,.1);color:var(--rd)}
 
-/* Category tabs */
-.cats { display: flex; gap: 4px; margin-bottom: 14px; flex-wrap: wrap; }
-.cat {
-  padding: 6px 14px; border-radius: 6px; font-size: 11px; font-weight: 600;
-  cursor: pointer; background: transparent; color: var(--text2);
-  border: 1px solid transparent; transition: all 0.15s;
-}
-.cat:hover { color: var(--text); background: var(--surface); }
-.cat.on { background: var(--cyan-dim); color: var(--cyan); border-color: rgba(0,212,230,0.25); }
+.empty{padding:40px 20px;text-align:center;color:var(--tx2)}
+.empty h3{font-size:15px;margin-bottom:5px;color:var(--tx);font-weight:500}
+.ld{display:flex;align-items:center;justify-content:center;padding:80px 20px;flex-direction:column;gap:12px}
+.sp{width:28px;height:28px;border:2px solid var(--bd);border-top-color:var(--cy);border-radius:50%;animation:s .7s linear infinite}
+@keyframes s{to{transform:rotate(360deg)}}
 
-/* Table */
-.tw { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
-.ts { overflow-x: auto; }
-.info { padding: 12px 18px; font-family: var(--mono); font-size: 11px; color: var(--text2); border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
-
-table { width: 100%; border-collapse: collapse; font-size: 12px; }
-thead th {
-  background: var(--bg2); padding: 10px 12px; text-align: left;
-  font-family: var(--mono); font-size: 10px; text-transform: uppercase;
-  letter-spacing: 0.8px; color: var(--text2); font-weight: 600;
-  border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 2;
-  white-space: nowrap;
-}
-thead th.yc { color: var(--cyan); background: rgba(0,212,230,0.04); }
-
-tbody tr { border-bottom: 1px solid rgba(0,210,230,0.05); transition: background 0.1s; }
-tbody tr:hover { background: rgba(0,210,230,0.03); }
-tbody tr:last-child { border-bottom: none; }
-
-td { padding: 9px 12px; white-space: nowrap; }
-td.pn { font-weight: 500; color: var(--text); max-width: 260px; white-space: normal; word-break: break-word; font-size: 12px; }
-td.dim { color: var(--text2); font-size: 11px; }
-td.pr { font-family: var(--mono); font-weight: 600; font-size: 12px; }
-td.pr.yp { color: var(--cyan); background: rgba(0,212,230,0.04); }
-td.pr.lo { color: var(--green); }
-td.pr.hi { color: var(--red); }
-td.pr.na { color: var(--text3); font-weight: 400; }
-
-.diff { display: inline-block; font-size: 9px; padding: 1px 5px; border-radius: 3px; margin-left: 4px; font-weight: 600; font-family: var(--mono); }
-.diff.dn { background: rgba(0,230,118,0.12); color: var(--green); }
-.diff.up { background: rgba(255,61,87,0.12); color: var(--red); }
-
-.empty { padding: 50px 20px; text-align: center; color: var(--text2); }
-.empty h3 { font-size: 16px; margin-bottom: 6px; color: var(--text); font-weight: 500; }
-
-.loading { display: flex; align-items: center; justify-content: center; padding: 80px 20px; flex-direction: column; gap: 14px; }
-.spin { width: 32px; height: 32px; border: 2px solid var(--border); border-top-color: var(--cyan); border-radius: 50%; animation: sp 0.7s linear infinite; }
-@keyframes sp { to { transform: rotate(360deg); } }
-
-.row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-.flex1 { flex: 1; min-width: 0; }
-
-.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-@media (max-width: 900px) { .grid2 { grid-template-columns: 1fr; } }
-@media (max-width: 640px) {
-  .hdr { flex-direction: column; align-items: flex-start; }
-  .stats { grid-template-columns: repeat(2, 1fr); }
-}
-
-/* Glow line */
-.glow-line { height: 1px; background: linear-gradient(90deg, transparent, var(--cyan), transparent); margin: 20px 0; opacity: 0.3; }
+.row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:900px){.g2{grid-template-columns:1fr}}
+@media(max-width:640px){.hdr{flex-direction:column;align-items:flex-start}.stats{grid-template-columns:repeat(2,1fr)}}
 </style>
 </head>
 <body>
 <div id="root"></div>
 <script type="text/babel">
-const {useState,useEffect,useMemo,useCallback,useRef} = React;
+const{useState,useEffect,useMemo,useCallback,useRef}=React;
 
-// CT dispensary coordinates (approximate)
-const COORDS = {
-  "New Haven":[41.308,-72.928],"Bridgeport":[41.179,-73.189],"Orange":[41.278,-73.026],
-  "Branford":[41.280,-72.815],"Hamden":[41.396,-72.897],"Derby":[41.327,-73.089],
-  "Stratford":[41.185,-73.133],"Naugatuck":[41.486,-73.051],"Meriden":[41.538,-72.807],
-  "Stamford":[41.053,-73.539],"Newington":[41.698,-72.723],"Waterbury":[41.558,-73.037],
-  "Seymour":[41.397,-73.084],"Hartford":[41.764,-72.685],"Groton":[41.350,-72.078],
-  "Milford":[41.222,-73.057],"Bristol":[41.672,-72.949],"Manchester":[41.776,-72.521],
-  "Willimantic":[41.711,-72.208],"Norwalk":[41.118,-73.408],"Old Saybrook":[41.292,-72.376],
-  "West Hartford":[41.762,-72.742],"Canton":[41.841,-72.898]
-};
+const COORDS={"New Haven":[41.308,-72.928],"Bridgeport":[41.179,-73.189],"Orange":[41.278,-73.026],"Branford":[41.280,-72.815],"Hamden":[41.396,-72.897],"Derby":[41.327,-73.089],"Stratford":[41.185,-73.133],"Naugatuck":[41.486,-73.051],"Meriden":[41.538,-72.807],"Stamford":[41.053,-73.539],"Newington":[41.698,-72.723],"Waterbury":[41.558,-73.037],"Seymour":[41.397,-73.084],"Hartford":[41.764,-72.685],"Groton":[41.350,-72.078],"Milford":[41.222,-73.057],"Bristol":[41.672,-72.949],"Manchester":[41.776,-72.521],"Willimantic":[41.711,-72.208],"Norwalk":[41.118,-73.408],"Old Saybrook":[41.292,-72.376],"West Hartford":[41.762,-72.742],"Canton":[41.841,-72.898],"South Norwalk":[41.095,-73.419],"New Britain":[41.661,-72.779],"East Hartford":[41.782,-72.612],"Danbury":[41.395,-73.454],"Greenwich":[41.027,-73.628],"Torrington":[41.800,-73.121],"Shelton":[41.316,-73.093],"Wallingford":[41.457,-72.823],"Vernon":[41.836,-72.459],"Ledyard":[41.440,-72.014],"North Haven":[41.391,-72.860],"West Haven":[41.271,-72.947]};
 
-function App() {
-  const [data,setData]=useState(null);
-  const [loading,setLoading]=useState(true);
-  const [q,setQ]=useState("");
-  const [sel,setSel]=useState(new Set());
-  const [cat,setCat]=useState("All");
-  const [comp,setComp]=useState(true);
-  const [mapHighlight,setMapHighlight]=useState(null);
-
-  useEffect(()=>{
-    fetch("dashboard_data.json?t="+Date.now())
-      .then(r=>r.json())
-      .then(d=>{
-        setData(d);
-        const all=getDisps(d.products||[]);
-        const aff=all.filter(x=>x.toLowerCase().includes("affinity"));
-        const rest=all.filter(x=>!x.toLowerCase().includes("affinity")).slice(0,5);
-        setSel(new Set([...aff,...rest]));
-        setLoading(false);
-      })
-      .catch(()=>setLoading(false));
-  },[]);
-
-  if(loading) return <div className="app"><div className="loading"><div className="spin"/><span style={{color:'var(--text2)',fontSize:13}}>Initializing intel feed...</span></div></div>;
-  if(!data?.products?.length) return <div className="app"><Hdr d={data}/><div className="empty"><h3>No data yet</h3><p style={{fontSize:13}}>Run the scraper to populate data.</p></div></div>;
-
-  return (
-    <div className="app">
-      <Hdr d={data}/>
-      <Stats d={data}/>
-      <div className="glow-line"/>
-      <div className="grid2">
-        <MapPanel data={data} sel={sel} highlight={mapHighlight} setHighlight={setMapHighlight}/>
-        <DispPanel data={data} sel={sel} setSel={setSel}/>
-      </div>
-      <SearchPanel q={q} setQ={setQ}/>
-      <CatTabs data={data} cat={cat} setCat={setCat}/>
-      <Tbl data={data} q={q} sel={sel} cat={cat} comp={comp} setComp={setComp}/>
-    </div>
-  );
+function HelmetSVG(){
+  return <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M32 4C20 4 12 14 12 26c0 6 2 10 4 14l2 4c1 2 2 6 2 8v4h6v-2c0-1 0-2 1-3l4-6c1-1 2-2 1-3-1-2-3-4-3-8 0-6 4-11 8-11s8 5 8 11c0 4-2 6-3 8-1 1 0 2 1 3l4 6c1 1 1 2 1 3v2h6v-4c0-2 1-6 2-8l2-4c2-4 4-8 4-14C52 14 44 4 32 4z" fill="none" stroke="#00f0ff" strokeWidth="1.5" opacity=".8"/>
+    <path d="M20 26c0-8 5-14 12-14s12 6 12 14" stroke="#00f0ff" strokeWidth="1" opacity=".4"/>
+    <path d="M16 30c0 0 6-2 16-2s16 2 16 2" stroke="#00f0ff" strokeWidth="1" opacity=".3"/>
+    <circle cx="32" cy="22" r="3" fill="none" stroke="#00f0ff" strokeWidth="1" opacity=".5"/>
+  </svg>;
 }
 
-function Hdr({d}) {
-  const t=d?.scraped_at?new Date(d.scraped_at).toLocaleString("en-US",{month:"short",day:"numeric",year:"numeric",hour:"numeric",minute:"2-digit"}):"—";
-  return <div className="hdr">
-    <div className="logo"><div className="logo-mark">A</div><h1>AFFINITY <b>INTEL</b></h1></div>
-    <div className="meta"><div>Last update: {t}</div><div>{d?.stats?.dispensary_count||0} dispensaries tracked</div></div>
+function App(){
+  const[data,setData]=useState(null);
+  const[loading,setLoading]=useState(true);
+  const[q,setQ]=useState("");
+  const[sel,setSel]=useState(new Set());
+  const[cat,setCat]=useState("All");
+  const[comp,setComp]=useState(true);
+
+  useEffect(()=>{
+    fetch("dashboard_data.json?t="+Date.now()).then(r=>r.json()).then(d=>{
+      setData(d);
+      const all=getDisps(d.products||[]);
+      const aff=all.filter(x=>x.toLowerCase().includes("affinity"));
+      const rest=all.filter(x=>!x.toLowerCase().includes("affinity")).slice(0,6);
+      setSel(new Set([...aff,...rest]));
+      setLoading(false);
+    }).catch(()=>setLoading(false));
+  },[]);
+
+  if(loading)return<div className="app"><div className="ld"><div className="sp"/><span style={{color:'var(--tx2)',fontSize:12,fontFamily:'var(--m)'}}>ATHENA initializing...</span></div></div>;
+  if(!data?.products?.length)return<div className="app"><Hdr d={data}/><div className="empty"><h3>No intel available</h3><p style={{fontSize:12}}>Run the scraper to begin.</p></div></div>;
+
+  return<div className="app">
+    <Hdr d={data}/>
+    <Stats d={data}/>
+    <div className="glow"/>
+    <div className="g2">
+      <MapPanel data={data} sel={sel}/>
+      <DispPanel data={data} sel={sel} setSel={setSel}/>
+    </div>
+    <SearchPanel q={q} setQ={setQ}/>
+    <CatTabs data={data} cat={cat} setCat={setCat}/>
+    <Tbl data={data} q={q} sel={sel} cat={cat} comp={comp} setComp={setComp}/>
   </div>;
 }
 
-function Stats({d}) {
-  const s=d?.stats||{};
-  const items=[
-    ["Active SKUs",s.total_active||s.unique_products||0],
-    ["Dispensaries",s.dispensary_count||0],
-    ["Comparable",s.comparable||0],
-    ["Deals",s.deals||0]
-  ];
-  return <div className="stats">{items.map(([l,v])=><div key={l} className="stat"><div className="stat-l">{l}</div><div className="stat-v">{(v||0).toLocaleString()}</div></div>)}</div>;
+function Hdr({d}){
+  const t=d?.scraped_at?new Date(d.scraped_at).toLocaleString("en-US",{month:"short",day:"numeric",year:"numeric",hour:"numeric",minute:"2-digit"}):"—";
+  return<div className="hdr">
+    <div className="logo">
+      <div className="helmet"><HelmetSVG/></div>
+      <div className="logo-text"><h1>ATHENA</h1><span>COMPETITIVE INTELLIGENCE</span></div>
+    </div>
+    <div className="meta"><div>Updated: {t}</div><div>{d?.stats?.dispensary_count||0} dispensaries tracked</div></div>
+  </div>;
 }
 
-function MapPanel({data,sel,highlight,setHighlight}) {
-  const mapRef=useRef(null);
-  const mapObjRef=useRef(null);
-  const markersRef=useRef([]);
+function Stats({d}){
+  const s=d?.stats||{};
+  return<div className="stats">{[
+    ["Active SKUs",s.total_active||0],["Dispensaries",s.dispensary_count||0],
+    ["Comparable",s.comparable||0],["Deals",s.deals||0],["Products",s.unique_products||0]
+  ].map(([l,v])=><div key={l} className="st"><div className="st-l">{l}</div><div className="st-v">{(v||0).toLocaleString()}</div></div>)}</div>;
+}
+
+function MapPanel({data,sel}){
+  const ref=useRef(null);const mRef=useRef(null);const mkRef=useRef([]);
 
   useEffect(()=>{
-    if(!mapRef.current||mapObjRef.current) return;
-    const m=L.map(mapRef.current,{zoomControl:true,attributionControl:false}).setView([41.4,-72.9],9);
+    if(!ref.current||mRef.current)return;
+    const m=L.map(ref.current,{zoomControl:true,attributionControl:false}).setView([41.4,-72.9],9);
     L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{maxZoom:18}).addTo(m);
-    mapObjRef.current=m;
+    mRef.current=m;
   },[]);
 
   useEffect(()=>{
-    const m=mapObjRef.current;
-    if(!m||!data) return;
-    markersRef.current.forEach(mk=>m.removeLayer(mk));
-    markersRef.current=[];
-
-    const disps=data.dispensaries||{};
-    const counts=data.stats?.dispensary_counts||{};
+    const m=mRef.current;if(!m||!data)return;
+    mkRef.current.forEach(mk=>m.removeLayer(mk));mkRef.current=[];
+    const disps=data.dispensaries||{};const counts=data.stats?.dispensary_counts||{};
 
     Object.entries(disps).forEach(([name,info])=>{
-      let lat=info.lat, lon=info.lon;
-      if(!lat||!lon) {
-        const c=COORDS[info.city];
-        if(c){lat=c[0]+(Math.random()-0.5)*0.01;lon=c[1]+(Math.random()-0.5)*0.01;}
-      }
-      if(!lat||!lon) return;
+      let lat,lon;
+      const c=COORDS[info.city];
+      if(c){lat=c[0]+(Math.random()-.5)*.008;lon=c[1]+(Math.random()-.5)*.008;}
+      if(!lat)return;
 
-      const isAff=name.toLowerCase().includes("affinity");
-      const isSel=sel.has(name);
-      const count=counts[name]||0;
-      const size=isAff?14:isSel?10:7;
-      const color=isAff?"#00f0ff":isSel?"#00d4e6":"#2a4a55";
-      const opacity=isSel?1:0.5;
+      const isA=name.toLowerCase().includes("affinity");
+      const isS=sel.has(name);
+      const sz=isA?16:isS?9:6;
+      const col=isA?"#00f0ff":isS?"#00d4e6":"#1e3d48";
+      const op=isS?1:.4;
+      const glow=isA?16:isS?8:0;
 
-      const icon=L.divIcon({
-        className:'',
-        html:`<div style="width:${size}px;height:${size}px;border-radius:50%;background:${color};box-shadow:0 0 ${isAff?12:6}px ${color};opacity:${opacity};border:1px solid rgba(255,255,255,0.2);"></div>`,
-        iconSize:[size,size],iconAnchor:[size/2,size/2]
-      });
+      const icon=L.divIcon({className:'',
+        html:`<div style="width:${sz}px;height:${sz}px;border-radius:50%;background:${col};box-shadow:0 0 ${glow}px ${col};opacity:${op};border:${isA?'2':'1'}px solid rgba(255,255,255,${isA?.3:.1});transition:all .2s"></div>`,
+        iconSize:[sz,sz],iconAnchor:[sz/2,sz/2]});
 
       const mk=L.marker([lat,lon],{icon}).addTo(m);
-      mk.bindPopup(`<b style="color:#00f0ff;">${name}</b><br>${info.city}<br><span style="color:#4d7a85;">${count} products</span>`);
-      mk.on('click',()=>setHighlight(name));
-      markersRef.current.push(mk);
+      mk.bindPopup(`<div style="min-width:120px"><b style="color:#00f0ff;font-size:13px">${name}</b><br><span style="color:#3d7585;font-size:11px">${info.city} — ${counts[name]||0} products</span></div>`);
+      mkRef.current.push(mk);
     });
   },[data,sel]);
 
-  return <div className="panel">
-    <div className="panel-t">CT dispensary map</div>
-    <div className="map-wrap" ref={mapRef}></div>
+  return<div className="pnl">
+    <div className="pnl-t">Connecticut dispensary map</div>
+    <div className="map-w" ref={ref}></div>
   </div>;
 }
 
-function getDisps(prods) {
+function getDisps(prods){
   const s=new Set();
   prods.forEach(p=>Object.keys(p.dispensaries||{}).forEach(d=>s.add(d)));
-  return [...s].sort((a,b)=>{
+  return[...s].sort((a,b)=>{
     const aa=a.toLowerCase().includes("affinity"),bb=b.toLowerCase().includes("affinity");
     if(aa&&!bb)return-1;if(!aa&&bb)return 1;return a.localeCompare(b);
   });
 }
 
-function DispPanel({data,sel,setSel}) {
+function DispPanel({data,sel,setSel}){
   const prods=data.products||[];
   const disps=useMemo(()=>getDisps(prods),[prods]);
   const counts=useMemo(()=>{
-    const c={};
-    disps.forEach(d=>c[d]=0);
+    const c={};disps.forEach(d=>c[d]=0);
     prods.forEach(p=>Object.keys(p.dispensaries||{}).forEach(d=>c[d]=(c[d]||0)+1));
     return c;
   },[prods,disps]);
+  const tog=useCallback(d=>{setSel(prev=>{const n=new Set(prev);if(n.has(d))n.delete(d);else n.add(d);return n})},[]);
 
-  const tog=useCallback(d=>{
-    setSel(prev=>{const n=new Set(prev);if(n.has(d))n.delete(d);else n.add(d);return n;});
-  },[setSel]);
-
-  return <div className="panel">
-    <div className="row" style={{justifyContent:'space-between',marginBottom:12}}>
-      <span className="panel-t" style={{margin:0}}>Select dispensaries</span>
+  return<div className="pnl">
+    <div className="row" style={{justifyContent:'space-between',marginBottom:10}}>
+      <span className="pnl-t" style={{margin:0}}>Compare dispensaries</span>
       <div className="row">
         <button className="btn" onClick={()=>setSel(new Set(disps))}>All</button>
-        <button className="btn" onClick={()=>{const a=disps.filter(d=>d.toLowerCase().includes("affinity"));setSel(new Set(a));}}>Mine</button>
-        <button className="btn" onClick={()=>{const a=disps.filter(d=>d.toLowerCase().includes("affinity"));const r=disps.filter(d=>!d.toLowerCase().includes("affinity")).slice(0,6);setSel(new Set([...a,...r]));}}>Reset</button>
+        <button className="btn" onClick={()=>setSel(new Set(disps.filter(d=>d.toLowerCase().includes("affinity"))))}>Mine</button>
+        <button className="btn" onClick={()=>{const a=disps.filter(d=>d.toLowerCase().includes("affinity"));const r=disps.filter(d=>!d.toLowerCase().includes("affinity")).slice(0,6);setSel(new Set([...a,...r]))}}>Reset</button>
       </div>
     </div>
     <div className="chips">
       {disps.map(d=>{
-        const y=d.toLowerCase().includes("affinity");
-        const on=sel.has(d);
-        return <div key={d} className={`chip ${on?"on":""} ${y?"you":""}`} onClick={()=>tog(d)}>
-          <span className="chip-dot"/>{d.replace("Dispensary - ","").replace("Dispensary ","")}<span className="chip-n">{counts[d]}</span>
+        const y=d.toLowerCase().includes("affinity"),on=sel.has(d);
+        return<div key={d} className={`ch ${on?"on":""} ${y?"you":""}`} onClick={()=>tog(d)}>
+          <span className="ch-d"/>{d.replace(/Dispensary\s*-?\s*/g,"")}<span className="ch-n">{counts[d]}</span>
         </div>;
       })}
     </div>
   </div>;
 }
 
-function SearchPanel({q,setQ}) {
-  return <div className="panel">
-    <div className="panel-t">Search products</div>
-    <div className="search-wrap">
-      <span className="search-ic">⌕</span>
-      <input type="search" placeholder="Type a product name, brand, or strain..." value={q} onChange={e=>setQ(e.target.value)}/>
+function SearchPanel({q,setQ}){
+  return<div className="pnl">
+    <div className="pnl-t">Search products</div>
+    <div className="srch">
+      <span className="srch-ic">&#9906;</span>
+      <input type="search" placeholder="Product name, brand, or strain..." value={q} onChange={e=>setQ(e.target.value)}/>
     </div>
   </div>;
 }
 
-function CatTabs({data,cat,setCat}) {
-  const cats=useMemo(()=>{
-    const s=new Set();
-    (data.products||[]).forEach(p=>s.add(p.category||"Other"));
-    return ["All",...[...s].sort()];
-  },[data]);
-  return <div className="cats">{cats.map(c=><div key={c} className={`cat ${cat===c?"on":""}`} onClick={()=>setCat(c)}>{c}</div>)}</div>;
+function CatTabs({data,cat,setCat}){
+  const cats=useMemo(()=>{const s=new Set();(data.products||[]).forEach(p=>s.add(p.category||"Other"));return["All",...[...s].sort()]},[data]);
+  return<div className="cats">{cats.map(c=><div key={c} className={`ct ${cat===c?"on":""}`} onClick={()=>setCat(c)}>{c}</div>)}</div>;
 }
 
-function Tbl({data,q,sel,cat,comp,setComp}) {
+function Tbl({data,q,sel,cat,comp,setComp}){
   const prods=data.products||[];
   const cols=useMemo(()=>[...sel].sort((a,b)=>{
     const aa=a.toLowerCase().includes("affinity"),bb=b.toLowerCase().includes("affinity");
@@ -393,77 +288,52 @@ function Tbl({data,q,sel,cat,comp,setComp}) {
 
   const rows=useMemo(()=>{
     let items=prods;
-    if(cat!=="All") items=items.filter(p=>p.category===cat);
-    if(q.trim()){
-      const s=q.toLowerCase();
-      items=items.filter(p=>(p.name||"").toLowerCase().includes(s)||(p.brand||"").toLowerCase().includes(s));
-    }
-    items=items.filter(p=>{
-      const d=Object.keys(p.dispensaries||{});
-      const n=d.filter(x=>sel.has(x)).length;
-      return comp?n>=2:n>=1;
-    });
+    if(cat!=="All")items=items.filter(p=>p.category===cat);
+    if(q.trim()){const s=q.toLowerCase();items=items.filter(p=>(p.name||"").toLowerCase().includes(s)||(p.brand||"").toLowerCase().includes(s))}
+    items=items.filter(p=>{const d=Object.keys(p.dispensaries||{});const n=d.filter(x=>sel.has(x)).length;return comp?n>=2:n>=1});
     return items;
   },[prods,q,sel,cat,comp]);
 
   const affCols=cols.filter(d=>d.toLowerCase().includes("affinity"));
-  const getYP=p=>{for(const d of affCols){if(p.dispensaries?.[d])return p.dispensaries[d];}return null;};
+  const getYP=p=>{for(const d of affCols){if(p.dispensaries?.[d])return p.dispensaries[d]}return null};
 
-  return <div className="tw">
-    <div className="info">
+  return<div className="tw">
+    <div className="inf">
       <span>{rows.length.toLocaleString()} product{rows.length!==1?"s":""}</span>
-      <div className="row" style={{gap:14}}>
-        <label style={{fontSize:11,color:'var(--text2)',cursor:'pointer',display:'flex',alignItems:'center',gap:5}}>
-          <input type="checkbox" checked={comp} onChange={e=>setComp(e.target.checked)}/>
-          Comparable only
+      <div className="row" style={{gap:12}}>
+        <label style={{fontSize:10,color:'var(--tx2)',cursor:'pointer',display:'flex',alignItems:'center',gap:4}}>
+          <input type="checkbox" checked={comp} onChange={e=>setComp(e.target.checked)}/>Comparable only
         </label>
         <span>{cols.length} dispensar{cols.length!==1?"ies":"y"}</span>
       </div>
     </div>
-    {!rows.length?<div className="empty"><h3>No matches</h3><p style={{fontSize:12}}>Adjust search, select more dispensaries, or uncheck comparable.</p></div>:
+    {!rows.length?<div className="empty"><h3>No matches</h3><p style={{fontSize:11}}>Adjust filters or select more dispensaries.</p></div>:
     <div className="ts"><table>
       <thead><tr>
-        <th style={{minWidth:180}}>Product</th>
-        <th>Brand</th>
-        <th>Cat</th>
-        {cols.map(d=>{
-          const y=d.toLowerCase().includes("affinity");
-          const sh=d.replace(/Dispensary\s*-?\s*/g,"").replace(/ - /g," ");
-          return <th key={d} className={y?"yc":""}>{y?"★ ":""}{sh}</th>;
-        })}
+        <th style={{minWidth:170}}>Product</th><th>Brand</th><th>Cat</th>
+        {cols.map(d=>{const y=d.toLowerCase().includes("affinity");const sh=d.replace(/Dispensary\s*-?\s*/g,"").replace(/ - /g," ");
+          return<th key={d} className={y?"yc":""}>{y?"★ ":""}{sh}</th>})}
       </tr></thead>
-      <tbody>
-        {rows.slice(0,500).map((p,i)=>{
-          const prices=cols.map(d=>p.dispensaries?.[d]??null);
-          const valid=prices.filter(x=>x&&x>0);
-          const mn=valid.length?Math.min(...valid):null;
-          const mx=valid.length>1?Math.max(...valid):null;
-          const yp=getYP(p);
-          return <tr key={i}>
-            <td className="pn">{p.name}</td>
-            <td className="dim">{p.brand}</td>
-            <td className="dim">{p.category}</td>
-            {cols.map(d=>{
-              const pr=p.dispensaries?.[d];
-              const y=d.toLowerCase().includes("affinity");
-              if(!pr) return <td key={d} className="pr na">—</td>;
-              let c="pr";
-              if(y) c+=" yp";
-              else if(valid.length>1&&pr===mn) c+=" lo";
-              else if(valid.length>1&&pr===mx) c+=" hi";
-              let df=null;
-              if(!y&&yp&&yp>0){
-                const pct=Math.round((pr-yp)/yp*100);
-                if(pct>0) df=<span className="diff up">+{pct}%</span>;
-                else if(pct<0) df=<span className="diff dn">{pct}%</span>;
-              }
-              return <td key={d} className={c}>${pr.toFixed(2)}{df}</td>;
-            })}
-          </tr>;
-        })}
-      </tbody>
+      <tbody>{rows.slice(0,500).map((p,i)=>{
+        const prices=cols.map(d=>p.dispensaries?.[d]??null);
+        const valid=prices.filter(x=>x&&x>0);
+        const mn=valid.length?Math.min(...valid):null;
+        const mx=valid.length>1?Math.max(...valid):null;
+        const yp=getYP(p);
+        return<tr key={i}>
+          <td className="pn">{p.name}</td><td className="dm">{p.brand}</td><td className="dm">{p.category}</td>
+          {cols.map(d=>{
+            const pr=p.dispensaries?.[d];const y=d.toLowerCase().includes("affinity");
+            if(!pr)return<td key={d} className="pr na">—</td>;
+            let c="pr";if(y)c+=" yp";else if(valid.length>1&&pr===mn)c+=" lo";else if(valid.length>1&&pr===mx)c+=" hi";
+            let df=null;
+            if(!y&&yp&&yp>0){const pct=Math.round((pr-yp)/yp*100);
+              if(pct>0)df=<span className="df up">+{pct}%</span>;
+              else if(pct<0)df=<span className="df dn">{pct}%</span>}
+            return<td key={d} className={c}>${pr.toFixed(2)}{df}</td>})}
+        </tr>})}</tbody>
     </table></div>}
-    {rows.length>500&&<div className="info"><span>Showing 500 of {rows.length.toLocaleString()}. Narrow your search.</span></div>}
+    {rows.length>500&&<div className="inf"><span>Showing 500 of {rows.length.toLocaleString()}</span></div>}
   </div>;
 }
 
