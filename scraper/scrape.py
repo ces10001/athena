@@ -11,7 +11,24 @@ from datetime import datetime, date
 AUTH0_DOMAIN    = "dev-cfqdc946.us.auth0.com"
 AUTH0_CLIENT_ID = "3lL2GMZKQYHw0en00bS4okH5wf02nRDu"
 HOODIE_API      = "https://app.hoodieanalytics.com/api"
-REFRESH_TOKEN   = os.environ.get("HOODIE_REFRESH_TOKEN", "")
+
+TOKEN_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "data", "new_refresh_token.txt")
+
+def get_refresh_token():
+    """Get refresh token: file first (rotated from last run), then env var."""
+    # 1. Try the rotated token from the last run's committed file
+    if os.path.exists(TOKEN_FILE):
+        with open(TOKEN_FILE) as f:
+            file_token = f.read().strip()
+        if file_token and len(file_token) > 10:
+            print(f"  Using rotated token from file ({len(file_token)} chars)")
+            return file_token
+    # 2. Fall back to GitHub secret
+    env_token = os.environ.get("HOODIE_REFRESH_TOKEN", "")
+    if env_token:
+        print(f"  Using token from HOODIE_REFRESH_TOKEN secret")
+        return env_token
+    return ""
 
 # EVERY town in CT that could have a dispensary — comprehensive coverage
 CT_CITIES = [
@@ -33,14 +50,15 @@ MAX_PAGES = 200  # 200 * 50 = 10,000 per city (API hard limit)
 
 
 def authenticate():
-    if not REFRESH_TOKEN:
-        print("  FATAL: HOODIE_REFRESH_TOKEN not set"); sys.exit(1)
+    refresh_token = get_refresh_token()
+    if not refresh_token:
+        print("  FATAL: No refresh token found (file or env)"); sys.exit(1)
     print("  Authenticating...")
     try:
         resp = requests.post(f"https://{AUTH0_DOMAIN}/oauth/token", json={
             "grant_type": "refresh_token",
             "client_id": AUTH0_CLIENT_ID,
-            "refresh_token": REFRESH_TOKEN,
+            "refresh_token": refresh_token,
         }, timeout=30)
     except Exception as e:
         print(f"  Network error: {e}"); sys.exit(1)
@@ -55,12 +73,11 @@ def authenticate():
 
     data = resp.json()
     new_rt = data.get("refresh_token")
-    if new_rt and new_rt != REFRESH_TOKEN:
-        os.makedirs("data", exist_ok=True)
-        with open("data/new_refresh_token.txt", "w") as f:
+    if new_rt and new_rt != refresh_token:
+        os.makedirs(os.path.dirname(TOKEN_FILE), exist_ok=True)
+        with open(TOKEN_FILE, "w") as f:
             f.write(new_rt)
-        print("  !! Token rotated — saved to data/new_refresh_token.txt")
-        print("  !! UPDATE HOODIE_REFRESH_TOKEN in GitHub Secrets!")
+        print("  Token rotated — saved for next run (self-sustaining)")
 
     token = data.get("id_token")
     if not token:
