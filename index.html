@@ -18,7 +18,7 @@
 ::selection{background:var(--cy);color:#000}::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:var(--bg2)}::-webkit-scrollbar-thumb{background:var(--tx3);border-radius:3px}
 .app{max-width:1520px;margin:0 auto;padding:14px 22px}
 .hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;flex-wrap:wrap;gap:12px}
-.logo{display:flex;align-items:center;gap:14px}.logo img{width:46px;height:46px;object-fit:contain;animation:helmglow 3s ease-in-out infinite}@keyframes helmglow{0%,100%{filter:drop-shadow(0 0 6px rgba(0,240,255,.2))}50%{filter:drop-shadow(0 0 18px rgba(0,240,255,.7)) drop-shadow(0 0 30px rgba(0,240,255,.3))}}
+.logo{display:flex;align-items:center;gap:14px}.logo img{width:58px;height:58px;object-fit:contain;mix-blend-mode:screen;animation:helmglow 3s ease-in-out infinite}@keyframes helmglow{0%,100%{filter:drop-shadow(0 0 6px rgba(0,240,255,.2))}50%{filter:drop-shadow(0 0 18px rgba(0,240,255,.7)) drop-shadow(0 0 30px rgba(0,240,255,.3))}}
 .lt{display:flex;flex-direction:column}.lt h1{font-size:28px;font-weight:800;letter-spacing:4px;color:var(--cy2);line-height:1;text-shadow:0 0 20px rgba(0,240,255,.3)}.lt span{font-size:10px;letter-spacing:2px;color:var(--tx2);font-family:var(--m);margin-top:2px}
 .meta{font-family:var(--m);font-size:10px;color:var(--tx2);text-align:right;line-height:1.7}
 .glow{height:1px;background:linear-gradient(90deg,transparent,var(--cy),transparent);margin:10px 0;opacity:.25}
@@ -147,7 +147,7 @@ function App(){
 
 function Hdr({d}){
   const t=d?.scraped_at?new Date(d.scraped_at).toLocaleString("en-US",{month:"short",day:"numeric",year:"numeric",hour:"numeric",minute:"2-digit"}):"";
-  return<div className="hdr"><div className="logo"><img src={window.HELMET_IMG} alt=""/><div className="lt"><h1>ATHENA</h1><span>COMPETITIVE INTELLIGENCE</span></div></div>
+  return<div className="hdr"><div className="logo"><img src={window.HELMET_IMG} alt=""/><div className="lt"><h1>ATHENA</h1></div></div>
     <div className="meta">{d&&<>{t&&<div>Updated: {t}</div>}<div>{d.stats?.unique_locations||d.stats?.dispensary_count||0} dispensaries | {(d.stats?.total_active||0).toLocaleString()} products</div></>}</div></div>;
 }
 
