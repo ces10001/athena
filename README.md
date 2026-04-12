@@ -1,1 +1,1 @@
-# affinity-intel
+# athena-intel
