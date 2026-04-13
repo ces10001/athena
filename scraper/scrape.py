@@ -370,19 +370,19 @@ def build_dashboard(all_items):
             by_disp[dn] = {"city": item.get("CITY", ""), "items": []}
         by_disp[dn]["items"].append(item)
 
-    # Build product comparison map using SKU-based matching
+    # Build product comparison map using name-based matching
     product_map = {}
     for dn, info in by_disp.items():
         for item in info["items"]:
             name = (item.get("NAME") or "").strip()
-            price = item.get("ACTUAL_PRICE")
-            if not name or not price or price <= 0:
+            original_price = item.get("ORIGINAL_PRICE") or item.get("ACTUAL_PRICE")
+            actual_price = item.get("ACTUAL_PRICE")
+            if not name or not original_price or original_price <= 0:
                 continue
 
             pkey = make_product_key(item)
             
             if pkey not in product_map:
-                # Use the cleanest name as display name
                 product_map[pkey] = {
                     "name": name,
                     "brand": (item.get("BRAND") or "Unknown").strip(),
@@ -390,8 +390,12 @@ def build_dashboard(all_items):
                     "cannabis_type": item.get("CANNABIS_TYPE", ""),
                     "sku": extract_sku(name),
                     "dispensaries": {},
+                    "promos": {},
                 }
-            product_map[pkey]["dispensaries"][dn] = round(float(price), 2)
+            product_map[pkey]["dispensaries"][dn] = round(float(original_price), 2)
+            # Store promo price if on promotion
+            if item.get("IS_ON_PROMOTION") and actual_price and actual_price < original_price:
+                product_map[pkey]["promos"][dn] = round(float(actual_price), 2)
 
     comparable = sorted(
         [v for v in product_map.values() if len(v["dispensaries"]) >= 2],
