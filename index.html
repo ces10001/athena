@@ -34,7 +34,7 @@
 .pnl-d{font-size:13px;color:var(--tx2);margin-bottom:10px;line-height:1.4}
 .map-w{height:320px;border-radius:8px;overflow:hidden;border:1px solid var(--bd)}
 .leaflet-container{background:var(--bg2)!important}
-.leaflet-tile{filter:brightness(.75) saturate(.35) hue-rotate(160deg) contrast(1.15)!important}
+.leaflet-tile{filter:brightness(.9) saturate(.25) hue-rotate(160deg) contrast(1.3)!important}
 .leaflet-control-zoom a{background:var(--sf)!important;color:var(--cy)!important;border-color:var(--bd)!important}
 .leaflet-popup-content-wrapper{background:var(--sf)!important;color:var(--tx)!important;border:1px solid var(--bd2)!important;border-radius:8px!important}
 .leaflet-popup-tip{background:var(--sf)!important}
@@ -125,7 +125,7 @@ function App(){
       if(d.deals)d.deals=d.deals.filter(function(x){return!isAccessory(x)});
       if(d.velocity)d.velocity=d.velocity.filter(function(x){return!isAccessory(x)});
       if(d.stock_alerts)d.stock_alerts=d.stock_alerts.filter(function(x){return!isAccessory(x)});
-      setData(d);var all=getDisps(d.products||[]);setSel(new Set(all.filter(isAff).concat(all.filter(function(x){return!isAff(x)}).slice(0,6))));
+      setData(d);var all=getDisps(d.products||[]);setSel(new Set(all.filter(isAff)));
     }).catch(function(e){setErr(e.message)});
   },[]);
   if(err)return React.createElement("div",{className:"app"},React.createElement(Hdr,null),React.createElement("div",{className:"empty"},React.createElement("h3",null,"Could not load data"),React.createElement("p",{style:{fontSize:12}},err)));
@@ -201,17 +201,35 @@ function IntelTab({data,q,setQ,sel,setSel,cat,setCat,comp,setComp,radius,setRadi
       })()}
     </div>
     <div className="glow"/>
-    <div className="g2"><MapPanel data={data} sel={sel} radius={radius} setRadius={setRadius}/><DispPanel data={data} sel={sel} setSel={setSel}/></div>
+    <div className="g2"><MapPanel data={data} sel={sel} setSel={setSel} radius={radius} setRadius={setRadius}/><DispPanel data={data} sel={sel} setSel={setSel}/></div>
     <div className="pnl"><div className="pnl-t">Search products</div><div className="pnl-d">Find any product by name, brand, or strain across all dispensaries.</div><div className="srch"><span className="srch-ic">{String.fromCharCode(8981)}</span><input type="search" placeholder="Product name, brand, or strain..." value={q} onChange={e=>setQ(e.target.value)}/></div></div>
     <CatTabs data={data} cat={cat} setCat={setCat}/>
     <Tbl data={data} q={q} sel={sel} cat={cat} comp={comp} setComp={setComp}/></>;
 }
 
-function MapPanel({data,sel,radius,setRadius}){
+function MapPanel({data,sel,setSel,radius,setRadius}){
   const ref=useRef(null),mRef=useRef(null),mkRef=useRef([]),circRef=useRef(null);
   const[center,setCenter]=useState(null);const[cLabel,setCLabel]=useState("Click map or dispensary to set center");
   useEffect(()=>{if(!ref.current||mRef.current)return;const m=L.map(ref.current,{zoomControl:true,attributionControl:false}).setView([41.35,-72.9],9);L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{maxZoom:18}).addTo(m);m.on('click',e=>{setCenter([e.latlng.lat,e.latlng.lng]);setCLabel(e.latlng.lat.toFixed(3)+", "+e.latlng.lng.toFixed(3))});mRef.current=m},[]);
-  useEffect(()=>{const m=mRef.current;if(!m||!center)return;if(circRef.current)m.removeLayer(circRef.current);circRef.current=L.circle(center,{radius:radius*1609.34,color:'#00f0ff',weight:1.5,opacity:.5,fillColor:'#00f0ff',fillOpacity:.06,dashArray:'6 4'}).addTo(m)},[radius,center]);
+  useEffect(()=>{
+    const m=mRef.current;if(!m||!center)return;
+    if(circRef.current)m.removeLayer(circRef.current);
+    var radiusM=radius*1609.34;
+    circRef.current=L.circle(center,{radius:radiusM,color:'#00f0ff',weight:1.5,opacity:.5,fillColor:'#00f0ff',fillOpacity:.06,dashArray:'6 4'}).addTo(m);
+    // Auto-select dispensaries within radius
+    if(data&&data.dispensaries){
+      var inRadius=new Set();
+      var cll=L.latLng(center[0],center[1]);
+      Object.entries(data.dispensaries).forEach(function(e){
+        var dn=e[0],info=e[1];
+        var c=COORDS[info.city];if(!c)return;
+        var h=hashStr(dn);var lat=c[0]+((h%100)-50)*.00008;var lon=c[1]+(((h>>8)%100)-50)*.00008;
+        var dist=cll.distanceTo(L.latLng(lat,lon));
+        if(dist<=radiusM)inRadius.add(dn);
+      });
+      if(inRadius.size>0)setSel(inRadius);
+    }
+  },[radius,center]);
   useEffect(()=>{const m=mRef.current;if(!m||!data)return;mkRef.current.forEach(mk=>m.removeLayer(mk));mkRef.current=[];const disps=data.dispensaries||{};const counts=data.stats?.dispensary_counts||{};
     Object.entries(disps).forEach(([name,info])=>{const c=COORDS[info.city];if(!c)return;const h=hashStr(name);const lat=c[0]+((h%100)-50)*.00008;const lon=c[1]+(((h>>8)%100)-50)*.00008;const isA=isAff(name);const isS=sel.has(name);const sz=isA?14:isS?8:5;const col=isA?"#00f0ff":isS?"#ff8c00":"#1e3d48";
       const icon=L.divIcon({className:'',html:'<div style="width:'+sz+'px;height:'+sz+'px;border-radius:50%;background:'+col+';box-shadow:0 0 '+(isA?14:isS?6:0)+'px '+col+';opacity:'+(isS?1:.35)+';border:'+(isA?2:1)+'px solid rgba(255,255,255,'+(isA?.3:.08)+')"></div>',iconSize:[sz,sz],iconAnchor:[sz/2,sz/2]});
@@ -235,7 +253,7 @@ function DispPanel({data,sel,setSel}){
       <div className="row">
         <button className="btn" onClick={()=>setSel(new Set(allD))}>All</button>
         <button className="btn" onClick={()=>setSel(new Set(allD.filter(isAff)))}>Mine</button>
-        <button className="btn" onClick={()=>setSel(new Set([...allD.filter(isAff),...allD.filter(x=>!isAff(x)).slice(0,6)]))}>Reset</button>
+        <button className="btn" onClick={()=>setSel(new Set())}>Clear All</button>
       </div>
     </div>
     <div className="pnl-d">Select dispensaries to compare side-by-side in the price table below.</div>
@@ -279,12 +297,17 @@ function AlertsTab({data}){
 function normName(n){
   var s=(n||"").toLowerCase();
   s=s.replace(/\([^)]*\)/g,"");
+  s=s.replace(/\b[tchdTCHD]*\s*\d+\.?\d*\s*%?/g,"");
+  s=s.replace(/\d+\.?\d*\s*%/g,"");
   s=s.replace(/\b\d+\.?\d*\s*(?:g|mg|ml|oz)\b/gi,"");
-  s=s.replace(/\b\d+pk\b/gi,"");
-  s=s.replace(/\b\d{3,6}\b/g,"");
-  s=s.replace(/[-_|]+/g," ");
+  s=s.replace(/\b\d+\s*pk\b/gi,"");
+  s=s.replace(/\b\d+\.?\d*\b/g,"");
+  s=s.replace(/\b(whole|flower|premium|reserve|mini|minis)\b/gi,"");
+  s=s.replace(/[-_|/]+/g," ");
   s=s.replace(/\s+/g," ").trim();
-  return s;
+  var words=s.split(" ").filter(function(w){return w.length>0});
+  words.sort();
+  return words.join(" ");
 }
 
 function GapsTab({data}){
